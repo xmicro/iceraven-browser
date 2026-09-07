@@ -36,10 +36,7 @@ class UnifiedTrustPanelTest {
     @get:Rule(order = 1)
     val composeTestRule =
         AndroidComposeTestRuleV2(
-            HomeActivityIntentTestRule(
-                isUnifiedTrustPanelEnabled = true,
-                isPWAsPromptEnabled = false,
-            ),
+            HomeActivityIntentTestRule(),
         ) { it.activity }
 
     @get:Rule
@@ -53,6 +50,11 @@ class UnifiedTrustPanelTest {
     val memoryLeaksRule = DetectMemoryLeaksRule(composeTestRule = { composeTestRule })
 
     // TestRail: https://mozilla.testrail.io/index.php?/cases/view/3186718
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.UnifiedTrustPanelTest#verifySecurePageConnectionFromQuickSettingsWithNoTrackersTest"],
+        bug = 2057420,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifySecurePageConnectionFromQuickSettingsWithNoTrackersTest() {
@@ -87,6 +89,11 @@ class UnifiedTrustPanelTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3186721
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.UnifiedTrustPanelTest#verifyInsecurePageConnectionFromQuickSettingsWithTrackersTest"],
+        bug = 2057420,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyInsecurePageConnectionFromQuickSettingsWithTrackersTest() {
@@ -327,6 +334,11 @@ class UnifiedTrustPanelTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3186711
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.UnifiedTrustPanelTest#verifyInsecurePageConnectionFromQuickSettingsWithNoTrackersInCustomTabsTest"],
+        bug = 2057413,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyInsecurePageConnectionFromQuickSettingsWithNoTrackersInCustomTabsTest() {
@@ -367,6 +379,11 @@ class UnifiedTrustPanelTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3186714
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.UnifiedTrustPanelTest#verifyClearCookiesAndSiteDataFromQuickSettingsInCustomTabsTest"],
+        bug = 2057421,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyClearCookiesAndSiteDataFromQuickSettingsInCustomTabsTest() {

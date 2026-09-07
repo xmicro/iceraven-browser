@@ -6,12 +6,10 @@ package org.mozilla.fenix.components
 
 import android.app.Application
 import android.content.Context
-import android.net.ConnectivityManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.getSystemService
 import com.google.android.play.core.review.ReviewManagerFactory
 import io.github.forkmaintainers.iceraven.components.PagedAMOAddonsProvider
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +36,6 @@ import mozilla.components.service.fxrelay.eligibility.RelayEligibilityStore
 import mozilla.components.service.fxrelay.eligibility.middlewares.ClearLastUsedMiddleware
 import mozilla.components.support.base.android.DefaultProcessInfoProvider
 import mozilla.components.support.base.android.NotificationsDelegate
-import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.base.worker.Frequency
 import mozilla.components.support.remotesettings.DefaultRemoteSettingsSyncScheduler
 import mozilla.components.support.remotesettings.RemoteSettingsServer
@@ -46,7 +43,6 @@ import mozilla.components.support.remotesettings.RemoteSettingsService
 import mozilla.components.support.remotesettings.into
 import mozilla.components.support.utils.BuildManufacturerChecker
 import mozilla.components.support.utils.ClipboardHandler
-import mozilla.components.support.utils.ext.packageManagerCompatHelper
 import mozilla.components.support.utils.ext.packageManagerWrapper
 import org.mozilla.fenix.BuildConfig
 import org.mozilla.fenix.Config
@@ -61,10 +57,9 @@ import org.mozilla.fenix.components.appstate.AppAction
 import org.mozilla.fenix.components.appstate.AppState
 import org.mozilla.fenix.components.appstate.setup.checklist.SetupChecklistState
 import org.mozilla.fenix.components.appstate.setup.checklist.getSetupChecklistCollection
-import org.mozilla.fenix.components.appstate.sports.SportsWidgetState
 import org.mozilla.fenix.components.bookmarks.lastSavedFolderCache
 import org.mozilla.fenix.components.ipprotection.IPProtection
-import org.mozilla.fenix.components.lens.GoogleLensAIControlFeature
+import org.mozilla.fenix.components.ipprotection.IPProtectionAuthSources
 import org.mozilla.fenix.components.llm.Llm
 import org.mozilla.fenix.components.llm.ext.accessTokenProvider
 import org.mozilla.fenix.components.metrics.MetricsMiddleware
@@ -87,12 +82,6 @@ import org.mozilla.fenix.home.middleware.HomeTelemetryMiddleware
 import org.mozilla.fenix.home.setup.store.DefaultSetupChecklistRepository
 import org.mozilla.fenix.home.setup.store.SetupChecklistPreferencesMiddleware
 import org.mozilla.fenix.home.setup.store.SetupChecklistTelemetryMiddleware
-import org.mozilla.fenix.home.sports.SportsWidgetMiddleware
-import org.mozilla.fenix.home.sports.WorldCupMatchesRepository
-import org.mozilla.fenix.home.sports.client.AppServicesWorldCupMatchesClient
-import org.mozilla.fenix.home.sports.client.mockWorldCupBaseHost
-import org.mozilla.fenix.home.sports.hasWorldCupEnded
-import org.mozilla.fenix.ipprotection.IPProtectionManager
 import org.mozilla.fenix.ipprotection.store.DefaultIPProtectionPromptRepository
 import org.mozilla.fenix.messaging.state.MessagingMiddleware
 import org.mozilla.fenix.nimbus.FxNimbus
@@ -105,6 +94,7 @@ import org.mozilla.fenix.perf.StrictModeManager
 import org.mozilla.fenix.perf.lazyMonitored
 import org.mozilla.fenix.reviewprompt.ReviewPromptMiddleware
 import org.mozilla.fenix.search.VoiceSearchAIControlFeature
+import org.mozilla.fenix.settings.ToolbarShortcutSettingsSearchProvider
 import org.mozilla.fenix.settings.ai.AIControlsSearchProvider
 import org.mozilla.fenix.settings.datachoices.DataChoicesSearchProvider
 import org.mozilla.fenix.settings.emailmasks.middleware.DefaultEmailMasksRepository
@@ -115,7 +105,6 @@ import org.mozilla.fenix.settings.settingssearch.DefaultFenixSettingsIndexer
 import org.mozilla.fenix.termsofuse.TermsOfUseManager
 import org.mozilla.fenix.termsofuse.store.DefaultTermsOfUsePromptRepository
 import org.mozilla.fenix.utils.Settings
-import org.mozilla.fenix.utils.getApplicationInstalledTime
 import org.mozilla.fenix.utils.isLargeScreenSize
 import org.mozilla.fenix.wifi.WifiConnectionMonitor
 import java.util.concurrent.TimeUnit
@@ -129,7 +118,10 @@ private const val AMO_COLLECTION_MAX_CACHE_AGE = 2 * 24 * 60L // Two days in min
  * Note: these aren't just "components" from "android-components": they're any "component" that
  * can be considered a building block of our app.
  */
-class Components(private val context: Context) {
+class Components(
+    private val context: Context,
+    private val currentTimeMillis: () -> Long = { System.currentTimeMillis() },
+) {
     val backgroundServices by lazyMonitored {
         BackgroundServices(
             context,
@@ -244,9 +236,6 @@ class Components(private val context: Context) {
                 context.getString(R.string.remote_settings_server_prod) -> RemoteSettingsServer.Prod.into()
                 context.getString(R.string.remote_settings_server_dev) -> RemoteSettingsServer.Dev.into()
                 context.getString(R.string.remote_settings_server_stage) -> RemoteSettingsServer.Stage.into()
-                context.getString(R.string.remote_settings_server_prod_v2) -> RemoteSettingsServer.ProdV2.into()
-                context.getString(R.string.remote_settings_server_dev_v2) -> RemoteSettingsServer.DevV2.into()
-                context.getString(R.string.remote_settings_server_stage_v2) -> RemoteSettingsServer.StageV2.into()
                 else -> RemoteSettingsServer.Prod.into()
             },
             channel = BuildConfig.BUILD_TYPE,
@@ -325,7 +314,6 @@ class Components(private val context: Context) {
                 },
                 recentHistory = emptyList(),
                 setupChecklistState = setupChecklistState(),
-                sportsWidgetState = setupSportsWidgetState(),
             ).run { filterState(blocklistHandler) },
             middlewares = listOf(
                 ProfileMarkerMiddleware(markerName = "AppStore", profiler = core.engine.profiler),
@@ -349,7 +337,7 @@ class Components(private val context: Context) {
                     CrashMiddleware(
                         cache = SettingsCrashReportCache(settings),
                         crashReporter = analytics.crashReporter,
-                        currentTimeInMillis = { System.currentTimeMillis() },
+                        currentTimeInMillis = currentTimeMillis,
                     ),
                 ),
                 HomeTelemetryMiddleware(),
@@ -360,7 +348,6 @@ class Components(private val context: Context) {
                         val continuousOnboardingCompleted = settings.seventhDayOnboardingCompletedTimestamp != -1L
                         settings.continuousOnboardingFeatureEnabled && !continuousOnboardingCompleted
                     },
-                    shouldUseNewTriggerCriteria = { settings.newReviewPromptTriggerCriteriaEnabled },
                     shouldShowCustomPrompt = { settings.customReviewPromptUiEnabled && settings.isTelemetryEnabled },
                     disableCustomPrompt = { settings.customReviewPromptUiEnabled = false },
                     createJexlHelper = nimbus::createJexlHelper,
@@ -369,24 +356,6 @@ class Components(private val context: Context) {
                     settings.migrateLastReviewPromptTimePrefIfNeeded(nimbus.events)
                 },
                 AppVisualCompletenessMiddleware(performance.visualCompletenessQueue),
-                SportsWidgetMiddleware(
-                    sportsRepository = WorldCupMatchesRepository(
-                        client = AppServicesWorldCupMatchesClient(
-                            baseHostProvider = {
-                                if (settings.useMockWorldCupServer) {
-                                    mockWorldCupBaseHost(settings.mockWorldCupServerSession)
-                                } else {
-                                    null
-                                }
-                            },
-                        ),
-                    ),
-                    connectivityManager = requireNotNull(context.getSystemService<ConnectivityManager>()) {
-                        "ConnectivityManager unavailable"
-                    },
-                    fetchMinIntervalSeconds = settings.sportsWidgetFetchThrottleSeconds,
-                    bypassThrottle = { settings.useMockWorldCupServer },
-                ),
             ),
         ).also {
             it.dispatch(AppAction.SetupChecklistAction.Init)
@@ -406,15 +375,6 @@ class Components(private val context: Context) {
     } else {
         null
     }
-
-    private fun setupSportsWidgetState() = SportsWidgetState(
-        countriesSelected = settings.sportsSelectedCountries,
-        hasSkippedFollowTeam = settings.hasSkippedSportsFollowTeam,
-        isVisible = settings.showHomepageSportsWidget,
-        isFeatureEnabled = settings.enableHomepageSportsWidget,
-        isCountdownWidgetVisible = settings.showHomepageCountdownWidget,
-        forceOneWeekToWorldCup = settings.forceOneWeekToWorldCup,
-    )
 
     val fxSuggest by lazyMonitored { FxSuggest(context, remoteSettingsService.value, analytics.crashReporter) }
 
@@ -447,13 +407,6 @@ class Components(private val context: Context) {
     val settingsIndexer by lazyMonitored {
         DefaultFenixSettingsIndexer(
             context = context,
-            excludedPreferenceKeys = {
-                if (!settings.enableHomepageSportsWidget || hasWorldCupEnded()) {
-                    setOf(context.getString(R.string.pref_key_show_homepage_sports_widget))
-                } else {
-                    emptySet()
-                }
-            },
             additionalProviders = listOf(
                 DataChoicesSearchProvider,
                 AIControlsSearchProvider,
@@ -463,25 +416,13 @@ class Components(private val context: Context) {
                 FirefoxLabsSettingsSearchProvider(
                     isLabsEnabled = { settings.enableFirefoxLabs },
                 ),
+                ToolbarShortcutSettingsSearchProvider,
             ),
         )
     }
 
     val ipProtectionPromptRepository by lazyMonitored {
-        DefaultIPProtectionPromptRepository(
-            settings = settings,
-            installedTimeMillis = {
-                getApplicationInstalledTime(
-                    packageManagerCompatHelper = context.packageManagerCompatHelper,
-                    packageName = context.packageName,
-                    logger = Logger("DefaultIPProtectionPromptRepository"),
-                )
-            },
-        )
-    }
-
-    val ipProtectionManager by lazyMonitored {
-        IPProtectionManager(ipProtectionPromptRepository)
+        DefaultIPProtectionPromptRepository(settings)
     }
 
     val ads by lazyMonitored {
@@ -535,9 +476,6 @@ class Components(private val context: Context) {
                     onUpdateWidget = { VoiceSearchAIControlFeature.updateWidget(context) },
                 ),
             )
-            if (settings.googleLensIntegrationEnabled) {
-                it.register(GoogleLensAIControlFeature(settings = settings))
-            }
         }
     }
 
@@ -566,7 +504,10 @@ class Components(private val context: Context) {
             engine = core.engine,
             browserStore = core.store,
             syncStore = backgroundServices.syncStore,
-            lazyFxaAccountManager = lazy { backgroundServices.accountManager },
+            authSources = IPProtectionAuthSources(
+                fxaAccountManager = lazy { backgroundServices.accountManager },
+                integrityClient = lazy { integrityClient },
+            ),
             lazyAppStore = lazy { appStore },
             settings = settings,
             context = context,

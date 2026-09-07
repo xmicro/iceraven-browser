@@ -9,6 +9,7 @@ import androidx.annotation.VisibleForTesting
 import mozilla.components.support.utils.Browsers
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.isDefaultBrowserPromptSupported
+import org.mozilla.fenix.nimbus.FxNimbus
 import org.mozilla.fenix.onboarding.view.OnboardingPageUiData
 
 /**
@@ -60,32 +61,24 @@ class DefaultBrowserPromptManager(
 ) {
 
     @VisibleForTesting
-    internal fun canShowPrompt() = !storage.isDefaultBrowser &&
-        storage.isDefaultBrowserPromptSupported &&
-        !storage.promptToSetAsDefaultBrowserDisplayedInOnboarding
+    internal fun canShowPrompt(): Boolean {
+        return FxNimbus.features.defaultBrowserPrompt.value().enabled &&
+            !storage.isDefaultBrowser &&
+            storage.isDefaultBrowserPromptSupported &&
+            !storage.promptToSetAsDefaultBrowserDisplayedInOnboarding
+    }
 
     /**
      * Determines whether to show the default browser prompt during onboarding.
      *
-     * @param pagesToDisplay The list of onboarding pages that are being displayed to the user.
      * @param currentCard The currently displayed onboarding page.
      */
-    fun maybePromptToSetAsDefaultBrowser(
-        pagesToDisplay: List<OnboardingPageUiData>,
-        currentCard: OnboardingPageUiData,
-    ) {
-        val shouldWaitForTosToBeAccepted = pagesToDisplay.find {
-            it.type == OnboardingPageUiData.Type.TERMS_OF_SERVICE
-        }?.let { tosCard ->
-            val tosPosition = pagesToDisplay.indexOfFirst { it.type == tosCard.type }
-            val currentPosition = pagesToDisplay.indexOfFirst { it.type == currentCard.type }
-            // waiting until we move past a ToS card
-            tosPosition >= currentPosition
-        } ?: false
-
-        if (canShowPrompt() && !shouldWaitForTosToBeAccepted) {
+    fun maybePromptToSetAsDefaultBrowser(currentCard: OnboardingPageUiData) {
+        if (currentCard.isSetToDefaultCard() && canShowPrompt()) {
             promptToSetAsDefaultBrowser()
             storage.promptToSetAsDefaultBrowserDisplayedInOnboarding = true
         }
     }
+
+    private fun OnboardingPageUiData.isSetToDefaultCard() = type == OnboardingPageUiData.Type.DEFAULT_BROWSER
 }

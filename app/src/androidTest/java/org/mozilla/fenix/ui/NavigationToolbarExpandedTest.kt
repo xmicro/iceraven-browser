@@ -9,6 +9,7 @@ package org.mozilla.fenix.ui
 import android.content.pm.ActivityInfo
 import org.junit.Rule
 import org.junit.Test
+import org.mozilla.fenix.customannotations.Converted
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.AppAndSystemHelper.enableOrDisableBackGestureNavigationOnDevice
 import org.mozilla.fenix.helpers.AppAndSystemHelper.setScreenOrientation
@@ -17,6 +18,7 @@ import org.mozilla.fenix.helpers.FenixTestRule
 import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
 import org.mozilla.fenix.helpers.TestAssetHelper.getGenericAsset
 import org.mozilla.fenix.helpers.TestAssetHelper.refreshAsset
+import org.mozilla.fenix.helpers.TestHelper.exitMenu
 import org.mozilla.fenix.helpers.TestHelper.verifySnackBarText
 import org.mozilla.fenix.helpers.TestHelper.waitUntilSnackbarGone
 import org.mozilla.fenix.helpers.perf.DetectMemoryLeaksRule
@@ -46,7 +48,6 @@ class NavigationToolbarExpandedTest {
     val composeTestRule =
         AndroidComposeTestRuleV2(
             HomeActivityIntentTestRule(
-                isPWAsPromptEnabled = false,
                 isWallpaperOnboardingEnabled = false,
                 isOpenInAppBannerEnabled = false,
                 isMicrosurveyEnabled = false,
@@ -57,23 +58,6 @@ class NavigationToolbarExpandedTest {
 
     @get:Rule(order = 2)
     val memoryLeaksRule = DetectMemoryLeaksRule(composeTestRule = { composeTestRule })
-
-    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333205
-    @Test
-    fun verifyTheExpandedToolbarHomepageItemsTest() {
-        homeScreen(composeTestRule) {
-            verifyHomeWordmark()
-            verifyToolbarPosition(bottomPosition = false)
-        }
-        navigationToolbar(composeTestRule) {
-            verifyNavBarPosition()
-            verifyTheNavigationBarAddBookmarkButton()
-            verifyTheNavigationBarShareButton()
-            verifyTheNewTabButton()
-            verifyTheTabCounter("0")
-            verifyTheMainMenuButton()
-        }
-    }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333207
     @Test
@@ -100,6 +84,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333211
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyTheExpandedToolbarAddBookmarkButtonTest"],
+        bug = 2060480,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheExpandedToolbarAddBookmarkButtonTest() {
@@ -127,6 +116,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333212
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyTheExpandedToolbarShareButtonTest"],
+        bug = 2060480,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheExpandedToolbarShareButtonTest() {
@@ -150,6 +144,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333213
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.ToolbarTest#verifyTheExpandedToolbarNewTabButtonTest"],
+        bug = 2057957,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheExpandedToolbarNewTabButtonTest() {
@@ -167,6 +166,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333214
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.ToolbarTest#verifyTheExpandedToolbarTabTrayButtonTest"],
+        bug = 2057419,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheExpandedToolbarTabTrayButtonTest() {
@@ -181,6 +185,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333215
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.ToolbarTest#verifyTheExpandedToolbarMainMenuButtonTest"],
+        bug = 2057419,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheExpandedToolbarMainMenuButtonTest() {
@@ -264,6 +273,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333175
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyTheExpandedToolbarItemsInLandscapeModeTest"],
+        bug = 2060480,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheExpandedToolbarItemsInLandscapeModeTest() {
@@ -294,6 +308,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333183
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyTheExpandedToolbarNewTabButtonInLandscapeModeTest"],
+        bug = 2060480,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheExpandedToolbarNewTabButtonInLandscapeModeTest() {
@@ -313,6 +332,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333184
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyTheExpandedToolbarTabTrayButtonInLandscapeModeTest"],
+        bug = 2060480,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheExpandedToolbarTabTrayButtonInLandscapeModeTest() {
@@ -331,6 +355,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333185
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyTheExpandedToolbarMainMenuButtonInLandscapeModeTest"],
+        bug = 2060480,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheExpandedToolbarMainMenuButtonInLandscapeModeTest() {
@@ -392,6 +421,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333206
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyHomepageItemsWithTabStripTest"],
+        bug = 2060482,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyHomepageItemsWithTabStripTest() {
@@ -415,6 +449,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333193
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyTheTabStripUITest"],
+        bug = 2060482,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheTabStripUITest() {
@@ -450,6 +489,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333194
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyTheNewTabButtonWithTabStripEnabledTest"],
+        bug = 2060482,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheNewTabButtonWithTabStripEnabledTest() {
@@ -475,6 +519,11 @@ class NavigationToolbarExpandedTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3333195
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarExpandedTest#verifyTabsTrayWithTabStripEnabledTest"],
+        bug = 2060482,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTabsTrayWithTabStripEnabledTest() {
@@ -551,10 +600,44 @@ class NavigationToolbarExpandedTest {
             verifyTheBackButton()
             verifyTheForwardButton()
             verifyTheRefreshButton()
-            verifyTheNewTabButton(false)
+            verifyTheTabStripAddTabButton()
             verifyTheTabCounter("1")
             verifyTheMainMenuButton()
         }
         setScreenOrientation(composeTestRule, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+    }
+
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3911787
+    @Test
+    fun verifyTheExpandedToolbarHomepageItemsTest() {
+        homeScreen(composeTestRule) {
+            verifyEdgeToEdgeWallpaperApplied(composeTestRule)
+            verifyHomeWordmark()
+            verifyToolbarPosition(bottomPosition = false)
+        }
+        navigationToolbar(composeTestRule) {
+            verifyNavBarPositionForEdgeToEdge()
+            verifyTheNavigationBarAddBookmarkButton()
+            verifyTheNavigationBarShareButton()
+            verifyTheNewTabButton()
+            verifyTheTabCounter("0")
+            verifyTheMainMenuButton()
+        }
+        homeScreen(composeTestRule) {
+        }.openThreeDotMenu {
+        }.clickSettingsButton {
+        }.openCustomizeSubMenu {
+            clickBottomToolbarToggle()
+            verifyAddressBarPositionPreference("Bottom")
+            exitMenu()
+        }
+        navigationToolbar(composeTestRule) {
+            verifyNavBarPositionForEdgeToEdge()
+            verifyTheNavigationBarAddBookmarkButton()
+            verifyTheNavigationBarShareButton()
+            verifyTheNewTabButton()
+            verifyTheTabCounter("0")
+            verifyTheMainMenuButton()
+        }
     }
 }

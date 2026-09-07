@@ -188,6 +188,8 @@ internal fun MenuItem(
  * @param modifier [Modifier] to be applied to the layout.
  * @param description An optional description text below the label.
  * @param iconPainter [Painter] used to display an [Icon] after the list item.
+ * @param enabled Controls the enabled state of the list item. When `false`, the list item will not
+ * be clickable.
  * @param onClick Invoked when the user clicks on the item.
  */
 @Composable
@@ -196,12 +198,14 @@ internal fun MenuTextItem(
     modifier: Modifier = Modifier,
     description: String? = null,
     iconPainter: Painter? = null,
+    enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
 ) {
     TextListItem(
         label = label,
         maxLabelLines = 2,
         description = description,
+        enabled = enabled,
         minHeight = if (description != null) {
             MENU_ITEM_HEIGHT_WITH_DESC
         } else {
@@ -288,7 +292,7 @@ internal fun WebExtensionMenuItem(
                     ) {
                         Icon(
                             painter = painterResource(iconsR.drawable.mozac_ic_settings_24),
-                            tint = MaterialTheme.colorScheme.onSurface,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             contentDescription = null,
                         )
                     }
@@ -479,7 +483,7 @@ private fun getIconTint(state: MenuItemState): Color {
         MenuItemState.ACTIVE -> MaterialTheme.colorScheme.tertiary
         MenuItemState.WARNING -> MaterialTheme.colorScheme.error
         MenuItemState.CRITICAL -> Color.Unspecified
-        else -> MaterialTheme.colorScheme.onSurface
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 }
 
@@ -502,7 +506,7 @@ private fun WebExtensionMenuItemPreview() {
             WebExtensionMenuItem(
                 label = "label",
                 iconPainter = painterResource(iconsR.drawable.mozac_ic_extension_fill_24),
-                iconTint = MaterialTheme.colorScheme.onSurface,
+                iconTint = MaterialTheme.colorScheme.onSurfaceVariant,
                 enabled = true,
                 badgeText = "17",
                 onClick = {},
@@ -511,7 +515,7 @@ private fun WebExtensionMenuItemPreview() {
             // Web extensions may have multi-colored assets with no tint.
             WebExtensionMenuItem(
                 label = "colorful icon",
-                iconPainter = painterResource(iconsR.drawable.mozac_ic_shield_slash_critical_24),
+                iconPainter = painterResource(iconsR.drawable.mozac_ic_shield_slash_multicolor_24),
                 iconTint = Color.Unspecified,
                 enabled = true,
                 badgeText = "17",

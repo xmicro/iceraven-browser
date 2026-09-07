@@ -24,7 +24,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mozilla.fenix.GleanMetrics.MetaAttribution
+import org.mozilla.fenix.GleanMetrics.Pings
 import org.mozilla.fenix.GleanMetrics.PlayStoreAttribution
+import org.mozilla.fenix.GleanMetrics.Referrals
 import org.mozilla.fenix.helpers.FenixGleanTestRule
 import org.mozilla.fenix.utils.Settings
 import org.robolectric.RobolectricTestRunner
@@ -497,7 +499,238 @@ class InstallReferrerWorkerTest {
 
         assertTrue(settings.isUserXTwitterAttributed)
     }
+
+    @Test
+    fun `WHEN handleSuccess receives a Moloco-attributed referrer THEN isUserMolocoAttributed is set to true`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val referrer = "adjust_external_click_id=moloco_9b1deb4d-3b7d-4bad-9bdd-2b0d7b3d41a6&utm_medium=paid"
+
+        worker.handleSuccess(referrer, InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        assertTrue(settings.isUserMolocoAttributed)
+    }
+
+    @Test
+    fun `WHEN handleSuccess receives a non-Moloco referrer THEN isUserMolocoAttributed is set to false`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        settings.isUserMolocoAttributed = true
+
+        worker.handleSuccess("utm_source=google&utm_medium=cpc", InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        assertFalse(settings.isUserMolocoAttributed)
+    }
+
+    @Test
+    fun `WHEN handleSuccess receives a null referrer THEN isUserMolocoAttributed is not changed`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        settings.isUserMolocoAttributed = true
+
+        worker.handleSuccess(null, InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        assertTrue(settings.isUserMolocoAttributed)
+    }
+
+    @Test
+    fun `WHEN handleSuccess receives a Rakuten-attributed referrer THEN isUserRakutenAttributed is set to true`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val referrer = "utm_source=Rakuten&utm_medium=paid"
+
+        worker.handleSuccess(referrer, InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        assertTrue(settings.isUserRakutenAttributed)
+    }
+
+    @Test
+    fun `WHEN handleSuccess receives a non-Rakuten referrer THEN isUserRakutenAttributed is set to false`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        settings.isUserRakutenAttributed = true
+
+        worker.handleSuccess("utm_source=google&utm_medium=cpc", InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        assertFalse(settings.isUserRakutenAttributed)
+    }
+
+    @Test
+    fun `WHEN handleSuccess receives a null referrer THEN isUserRakutenAttributed is not changed`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        settings.isUserRakutenAttributed = true
+
+        worker.handleSuccess(null, InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        assertTrue(settings.isUserRakutenAttributed)
+    }
+
+    @Test
+    fun `WHEN handleSuccess receives a Skyflag-attributed referrer THEN isUserSkyflagAttributed is set to true`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val referrer = "utm_source=skyflag&utm_medium=paid"
+
+        worker.handleSuccess(referrer, InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        assertTrue(settings.isUserSkyflagAttributed)
+    }
+
+    @Test
+    fun `WHEN handleSuccess receives a non-Skyflag referrer THEN isUserSkyflagAttributed is set to false`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        settings.isUserSkyflagAttributed = true
+
+        worker.handleSuccess("utm_source=google&utm_medium=cpc", InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        assertFalse(settings.isUserSkyflagAttributed)
+    }
+
+    @Test
+    fun `WHEN handleSuccess receives a null referrer THEN isUserSkyflagAttributed is not changed`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        settings.isUserSkyflagAttributed = true
+
+        worker.handleSuccess(null, InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        assertTrue(settings.isUserSkyflagAttributed)
+    }
+
+    @Test
+    fun `GIVEN a referral referrer WHEN handleSuccess runs THEN the referrals ping is submitted with the code`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val job = Pings.referrals.testBeforeNextSubmit {
+            assertEquals(REFERRAL_CODE, Referrals.code.testGetValue())
+        }
+
+        worker.handleSuccess(referralReferrer(), InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        job.join()
+    }
+
+    @Test
+    fun `GIVEN a referral referrer WHEN handleSuccess runs THEN the code does not reach attribution telemetry`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val job = Pings.playStoreAttribution.testBeforeNextSubmit {
+            // Empty rather than absent: recordInstallReferrer sets all five params. The raw
+            // response drops utm_content entirely, so both fields agree that a referral install is
+            // indistinguishable from one carrying no utm_content at all.
+            assertEquals("", PlayStoreAttribution.content.testGetValue())
+            assertEquals(
+                "utm_source=SOURCE&utm_term=TERM",
+                PlayStoreAttribution.installReferrerResponse.testGetValue(),
+            )
+        }
+
+        worker.handleSuccess(referralReferrer(), InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        job.join()
+        assertTrue(Glean.testGetAttribution().content.isNullOrEmpty())
+        // utmContent is the only source for the nimbus ping's
+        // install_referrer_response_utm_content and the equivalent JEXL targeting attribute.
+        assertEquals("", settings.utmContent)
+    }
+
+    @Test
+    fun `GIVEN a referral referrer WHEN handleSuccess runs THEN the other UTM params are still recorded`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val job = Pings.playStoreAttribution.testBeforeNextSubmit {
+            assertEquals("SOURCE", PlayStoreAttribution.source.testGetValue())
+            assertEquals("TERM", PlayStoreAttribution.term.testGetValue())
+        }
+
+        worker.handleSuccess(referralReferrer(), InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        job.join()
+        assertEquals("SOURCE", settings.utmSource)
+    }
+
+    @Test
+    fun `GIVEN a referral-only referrer WHEN handleSuccess runs THEN no UTM params are recorded`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val job = Pings.playStoreAttribution.testBeforeNextSubmit {
+            assertNull(PlayStoreAttribution.source.testGetValue())
+            assertNull(PlayStoreAttribution.content.testGetValue())
+            assertEquals("", PlayStoreAttribution.installReferrerResponse.testGetValue())
+        }
+
+        worker.handleSuccess(
+            "utm_content=$REFERRAL_UTM_CONTENT_PREFIX$REFERRAL_CODE",
+            InstallReferrerClient.InstallReferrerResponse.OK,
+            settings,
+        )
+
+        job.join()
+        assertTrue(UTMParams.fromSettings(settings).isEmpty())
+    }
+
+    @Test
+    fun `GIVEN a referral preamble in utm_campaign WHEN handleSuccess runs THEN no ping is submitted and the campaign is recorded`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val referrer = "utm_campaign=$REFERRAL_UTM_CONTENT_PREFIX$REFERRAL_CODE"
+        val attributionJob = Pings.playStoreAttribution.testBeforeNextSubmit {
+            assertEquals(
+                "$REFERRAL_UTM_CONTENT_PREFIX$REFERRAL_CODE",
+                PlayStoreAttribution.campaign.testGetValue(),
+            )
+            assertEquals(referrer, PlayStoreAttribution.installReferrerResponse.testGetValue())
+        }
+
+        worker.handleSuccess(referrer, InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        attributionJob.join()
+        assertNull(Referrals.code.testGetValue())
+        assertFalse(settings.referralPingSubmitted)
+    }
+
+    @Test
+    fun `GIVEN a referral referrer WHEN handleSuccess runs twice THEN the code is recorded once`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val job = Pings.referrals.testBeforeNextSubmit {
+            assertEquals(REFERRAL_CODE, Referrals.code.testGetValue())
+        }
+
+        worker.handleSuccess(referralReferrer(), InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        job.join()
+        assertTrue(settings.referralPingSubmitted)
+
+        worker.handleSuccess(referralReferrer(), InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        // referrals.code has ping lifetime, so the first submission cleared it. Still absent means
+        // the second run never called set(), and so never submitted.
+        assertNull(Referrals.code.testGetValue())
+    }
+
+    @Test
+    fun `GIVEN a non-referral referrer WHEN handleSuccess runs THEN the raw referrer response is unchanged`() {
+        val worker = TestListenableWorkerBuilder<InstallReferrerWorker>(context).build()
+        val settings = Settings(context)
+        val referrer = "utm_source=SOURCE&utm_content=CONTENT"
+        val job = Pings.playStoreAttribution.testBeforeNextSubmit {
+            assertEquals(referrer, PlayStoreAttribution.installReferrerResponse.testGetValue())
+            assertEquals("CONTENT", PlayStoreAttribution.content.testGetValue())
+        }
+
+        worker.handleSuccess(referrer, InstallReferrerClient.InstallReferrerResponse.OK, settings)
+
+        job.join()
+    }
+
+    private fun referralReferrer() =
+        "utm_source=SOURCE&utm_content=$REFERRAL_UTM_CONTENT_PREFIX$REFERRAL_CODE&utm_term=TERM"
 }
+
+private const val REFERRAL_CODE = "0123456789ABCXYZ"
 
 private class FakeInstallReferrerClient(
     private val responseCode: Int = InstallReferrerClient.InstallReferrerResponse.OK,

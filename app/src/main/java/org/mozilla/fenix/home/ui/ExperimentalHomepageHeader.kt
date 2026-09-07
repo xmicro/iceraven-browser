@@ -45,6 +45,7 @@ import org.mozilla.fenix.home.ui.HomepageTestTag.PRIVATE_BROWSING_HOMEPAGE_BUTTO
 import org.mozilla.fenix.theme.FirefoxTheme
 import org.mozilla.fenix.theme.PreviewThemeProvider
 import org.mozilla.fenix.theme.Theme
+import org.mozilla.fenix.wallpapers.WallpaperTheme
 import mozilla.components.ui.icons.R as iconsR
 
 private const val NEWS_BUTTON_ANIMATION_TRANSITION_DURATION = 600
@@ -54,26 +55,20 @@ private const val NEWS_BUTTON_ANIMATION_DELAY = 500L
 /**
  * Homepage header for the entry points experiment.
  *
- * @param wordmarkTextColor [Color] for the wordmark.
  * @param showStoriesButton Whether to show the stories button or not.
  * @param showButtonAnimation Whether to animate the news label on the stories button.
  * @param onPrivateModeTapped Callback for when the private mode button is tapped.
  * @param onStoriesTapped Callback for when the stories button is tapped.
  * @param onNewsAnimationShown Callback invoked when the news button animation starts playing.
- * @param onLogoClicked Callback for when the logo is clicked.
- * @param isSportsWidgetEnabled Whether to show the Firefox sports logo or not.
  */
 @Suppress("LongParameterList")
 @Composable
 fun ExperimentalHomepageHeader(
-    wordmarkTextColor: Color?,
     showStoriesButton: Boolean,
     showButtonAnimation: Boolean,
     onPrivateModeTapped: () -> Unit,
     onStoriesTapped: () -> Unit,
     onNewsAnimationShown: () -> Unit,
-    onLogoClicked: () -> Unit,
-    isSportsWidgetEnabled: Boolean,
 ) {
     Box(
         modifier = Modifier
@@ -109,11 +104,7 @@ fun ExperimentalHomepageHeader(
         ) {
             Spacer(modifier = Modifier.height(28.dp))
 
-            WordmarkAndLogo(
-                wordmarkTextColor = wordmarkTextColor,
-                onLogoClicked = onLogoClicked,
-                isSportsWidgetEnabled = isSportsWidgetEnabled,
-            )
+            WordmarkAndLogo(wordmarkTextColor = WallpaperTheme.onWallpaper)
         }
     }
 }
@@ -141,17 +132,12 @@ fun ExperimentalPrivateHomepageHeader(onHomeTapped: () -> Unit) {
 private fun WordmarkAndLogo(
     wordmarkTextColor: Color?,
     modifier: Modifier = Modifier,
-    onLogoClicked: () -> Unit,
-    isSportsWidgetEnabled: Boolean,
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        WordmarkLogo(
-            onLogoClicked = onLogoClicked,
-            isSportsWidgetEnabled = isSportsWidgetEnabled,
-        )
+        WordmarkLogo()
         WordmarkText(wordmarkTextColor)
     }
 }
@@ -233,14 +219,11 @@ private fun HomepageHeaderPreview(
     FirefoxTheme(theme) {
         Surface {
             ExperimentalHomepageHeader(
-                wordmarkTextColor = null,
                 showStoriesButton = true,
                 showButtonAnimation = false,
                 onPrivateModeTapped = {},
                 onStoriesTapped = {},
                 onNewsAnimationShown = {},
-                onLogoClicked = {},
-                isSportsWidgetEnabled = false,
             )
         }
     }

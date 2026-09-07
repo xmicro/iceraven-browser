@@ -177,16 +177,6 @@ sealed class MenuAction : Action {
     data object RequestMobileSite : MenuAction()
 
     /**
-     * [MenuAction] dispatched to show the menu CFR.
-     */
-    data object OnCFRShown : MenuAction()
-
-    /**
-     * [MenuAction] dispatched when the menu CFR is dismissed.
-     */
-    data object OnCFRDismiss : MenuAction()
-
-    /**
      * [MenuAction] dispatched when the menu is clicked.
      */
     data object OnMoreMenuClicked : MenuAction()
@@ -232,9 +222,9 @@ sealed class MenuAction : Action {
         data object Settings : Navigate()
 
         /**
-         * [Navigate] action dispatched when navigating to the wallpaper settings.
+         * [Navigate] action dispatched when navigating to the homepage settings.
          */
-        data object Wallpaper : Navigate()
+        data object CustomizeHomepage : Navigate()
 
         /**
          * [Navigate] action dispatched when navigating to bookmarks.

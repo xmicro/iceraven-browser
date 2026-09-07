@@ -19,6 +19,7 @@ import org.mozilla.fenix.home.logo.LogoController
 import org.mozilla.fenix.home.logo.TrackingProtectionController
 import org.mozilla.fenix.home.pocket.PocketRecommendedStoriesCategory
 import org.mozilla.fenix.home.pocket.controller.PocketStoriesController
+import org.mozilla.fenix.home.pocket.controller.StoriesImpressionSource
 import org.mozilla.fenix.home.privatebrowsing.controller.PrivateBrowsingController
 import org.mozilla.fenix.home.recentsyncedtabs.RecentSyncedTab
 import org.mozilla.fenix.home.recentsyncedtabs.controller.RecentSyncedTabController
@@ -28,13 +29,10 @@ import org.mozilla.fenix.home.recentvisits.RecentlyVisitedItem.RecentHistoryGrou
 import org.mozilla.fenix.home.recentvisits.RecentlyVisitedItem.RecentHistoryHighlight
 import org.mozilla.fenix.home.recentvisits.controller.RecentVisitsController
 import org.mozilla.fenix.home.search.HomeSearchController
-import org.mozilla.fenix.home.sports.CountrySelectorSource
-import org.mozilla.fenix.home.sports.LiveMatchRefreshSource
-import org.mozilla.fenix.home.sports.SportsCardImpressionSource
-import org.mozilla.fenix.home.sports.SportsCardType
-import org.mozilla.fenix.home.sports.SportsController
 import org.mozilla.fenix.home.termsofuse.PrivacyNoticeBannerController
 import org.mozilla.fenix.home.toolbar.ToolbarController
+import org.mozilla.fenix.home.topsites.AddShortcutEntryPoint
+import org.mozilla.fenix.home.topsites.AddShortcutSource
 import org.mozilla.fenix.home.topsites.controller.TopSiteController
 import org.mozilla.fenix.wallpapers.WallpaperState
 
@@ -208,7 +206,6 @@ class SessionControlInteractor(
     private val privacyNoticeBannerController: PrivacyNoticeBannerController,
     private val trackingProtectionController: TrackingProtectionController,
     private val logoController: LogoController,
-    private val sportsController: SportsController,
 ) : HomepageInteractor {
 
     override fun onCollectionAddTabTapped(collection: TabCollection) {
@@ -279,8 +276,18 @@ class SessionControlInteractor(
         topSiteController.handleShortcutsLibraryViewed()
     }
 
-    override fun onSaveShortcut(title: String, url: String) {
-        topSiteController.handleSaveShortcut(title = title, url = url)
+    override fun onSaveShortcut(
+        title: String,
+        url: String,
+        source: AddShortcutSource,
+        entryPoint: AddShortcutEntryPoint,
+    ) {
+        topSiteController.handleSaveShortcut(
+            title = title,
+            url = url,
+            source = source,
+            entryPoint = entryPoint,
+        )
     }
 
     override fun showWallpapersOnboardingDialog(state: WallpaperState): Boolean {
@@ -381,16 +388,20 @@ class SessionControlInteractor(
         pocketStoriesController.handleStoryShown(storyShown, storyPosition)
     }
 
-    override fun onStoriesShown(storiesShown: List<PocketStory>) {
-        pocketStoriesController.handleStoriesShown(storiesShown)
+    override fun onStoriesShown(storiesShown: List<PocketStory>, source: StoriesImpressionSource) {
+        pocketStoriesController.handleStoriesShown(storiesShown, source)
     }
 
     override fun onCategoryClicked(categoryClicked: PocketRecommendedStoriesCategory) {
         pocketStoriesController.handleCategoryClick(categoryClicked)
     }
 
-    override fun onStoryClicked(storyClicked: PocketStory, storyPosition: Triple<Int, Int, Int>) {
-        pocketStoriesController.handleStoryClicked(storyClicked, storyPosition)
+    override fun onStoryClicked(
+        storyClicked: PocketStory,
+        storyPosition: Triple<Int, Int, Int>,
+        source: StoriesImpressionSource,
+    ) {
+        pocketStoriesController.handleStoryClicked(storyClicked, storyPosition, source)
     }
 
     override fun onDiscoverMoreClicked() {
@@ -429,30 +440,6 @@ class SessionControlInteractor(
         privacyNoticeBannerController.onBannerDisplayed()
     }
 
-    override fun onCountriesSelected(countryCodes: Set<String>) {
-        sportsController.handleCountriesSelected(countryCodes = countryCodes)
-    }
-
-    override fun onSkippedFollowTeam() {
-        sportsController.handleSkippedFollowTeam()
-    }
-
-    override fun onSportsWidgetDismissed() {
-        sportsController.handleSportsWidgetDismissed()
-    }
-
-    override fun onViewScheduleClicked() {
-        sportsController.handleViewScheduleClicked()
-    }
-
-    override fun onRefreshClicked(source: LiveMatchRefreshSource) {
-        sportsController.handleRefreshClicked(source)
-    }
-
-    override fun onCountdownWidgetDismissed() {
-        sportsController.handleCountdownWidgetDismissed()
-    }
-
     override fun onPrivacyReportTapped() {
         trackingProtectionController.handleProtectionStatusPillClicked()
     }
@@ -463,25 +450,5 @@ class SessionControlInteractor(
 
     override fun onLongfoxEntryPointShown() {
         logoController.handleLongfoxEntryPointShown()
-    }
-
-    override fun onGetCustomWallpaperClicked() {
-        sportsController.handleOnGetCustomWallpaperClicked()
-    }
-
-    override fun onSportsWidgetShareClicked() {
-        sportsController.handleSportsWidgetShareClicked()
-    }
-
-    override fun onMatchClicked(homeTeam: String?, awayTeam: String?, date: String?) {
-        sportsController.handleMatchClicked(homeTeam = homeTeam, awayTeam = awayTeam, date = date)
-    }
-
-    override fun onSportsWidgetCardShown(cardType: SportsCardType, source: SportsCardImpressionSource) {
-        sportsController.handleSportsWidgetCardShown(cardType = cardType, source = source)
-    }
-
-    override fun onCountrySelectorShown(source: CountrySelectorSource) {
-        sportsController.handleCountrySelectorShown(source)
     }
 }

@@ -4,7 +4,6 @@
 
 package org.mozilla.fenix.settings.wallpaper
 
-import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -38,6 +37,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -70,7 +70,6 @@ import org.mozilla.fenix.wallpapers.Wallpaper
  * @param onLearnMoreClick Callback for when the learn more action is clicked from the group description.
  * Parameters are the URL that is clicked and the name of the collection.
  */
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun WallpaperSettings(
     wallpaperGroups: Map<Wallpaper.Collection, List<Wallpaper>>,
@@ -238,12 +237,12 @@ private fun WallpaperThumbnailItem(
     }
     val border = if (isSelected) {
         BorderStroke(
-            width = FirefoxTheme.layout.border.thick,
+            width = FirefoxTheme.layout.border.heaviest,
             color = MaterialTheme.colorScheme.primary,
         )
     } else if (wallpaper.name == Wallpaper.DEFAULT) {
         BorderStroke(
-            width = FirefoxTheme.layout.border.thick,
+            width = FirefoxTheme.layout.border.heaviest,
             color = MaterialTheme.colorScheme.outlineVariant,
         )
     } else {
@@ -256,7 +255,6 @@ private fun WallpaperThumbnailItem(
             R.string.wallpapers_item_name_content_description,
             wallpaper.name,
         )
-
         // For the default wallpaper to be accessible, we should set the content description for
         // the Surface instead of the thumbnail image
         val contentDescriptionModifier = if (bitmap == null) {
@@ -266,49 +264,80 @@ private fun WallpaperThumbnailItem(
         } else {
             Modifier
         }
-
         Surface(
             modifier = Modifier
                 .width(width = FirefoxTheme.layout.size.static1000)
                 .aspectRatio(aspectRatio)
                 .debouncedClickable { onSelect(wallpaper) }
-                .then(contentDescriptionModifier),
+                .then(contentDescriptionModifier)
+                .wallpaperThumbnailTestTag(
+                    wallpaper = wallpaper,
+                    isSelected = isSelected,
+                ),
             shape = MaterialTheme.shapes.small,
             border = border,
             shadowElevation = FirefoxTheme.layout.elevation.level2,
         ) {
-            if (bitmap == null) {
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .edgeToEdgeGradientConditional { wallpaper == Wallpaper.EdgeToEdge },
-                )
-            } else {
-                bitmap?.let {
-                    Image(
-                        bitmap = it.asImageBitmap(),
-                        contentScale = ContentScale.FillBounds,
-                        contentDescription = description,
-                        modifier = Modifier.fillMaxSize(),
-                        alpha = if (isLoading) loadingOpacity else 1.0f,
-                    )
-                }
-            }
-
-            if (isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(FirefoxTheme.layout.size.circularIndicatorDiameter),
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            }
+            WallpaperThumbnailContent(
+                wallpaper = wallpaper,
+                bitmap = bitmap,
+                description = description,
+                isLoading = isLoading,
+                loadingOpacity = loadingOpacity,
+            )
         }
     }
 }
+
+@Composable
+private fun WallpaperThumbnailContent(
+    wallpaper: Wallpaper,
+    bitmap: Bitmap?,
+    description: String,
+    isLoading: Boolean,
+    loadingOpacity: Float,
+) {
+    if (bitmap == null) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxSize()
+                .edgeToEdgeGradientConditional { wallpaper == Wallpaper.EdgeToEdge },
+        )
+    } else {
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentScale = ContentScale.FillBounds,
+            contentDescription = description,
+            modifier = Modifier.fillMaxSize(),
+            alpha = if (isLoading) loadingOpacity else 1.0f,
+        )
+    }
+
+    if (isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(FirefoxTheme.layout.size.circularIndicatorDiameter),
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun Modifier.wallpaperThumbnailTestTag(
+    wallpaper: Wallpaper,
+    isSelected: Boolean,
+): Modifier =
+    this.testTag(
+        if (isSelected) {
+            "${WallpaperSettingsTestTag.WALLPAPER_THUMBNAIL_SELECTED}.${wallpaper.name}"
+        } else {
+            "${WallpaperSettingsTestTag.WALLPAPER_THUMBNAIL_ITEM}.${wallpaper.name}"
+        },
+    )
 
 @Composable
 private fun Modifier.edgeToEdgeGradientConditional(predicate: () -> Boolean): Modifier =

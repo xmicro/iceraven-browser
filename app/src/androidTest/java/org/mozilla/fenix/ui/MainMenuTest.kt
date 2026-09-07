@@ -14,11 +14,13 @@ import org.junit.Test
 import org.mozilla.fenix.IntentReceiverActivity
 import org.mozilla.fenix.R
 import org.mozilla.fenix.customannotations.Converted
+import org.mozilla.fenix.customannotations.SkipLeaks
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.AppAndSystemHelper.assertExternalAppOpens
 import org.mozilla.fenix.helpers.AppAndSystemHelper.assertNativeAppOpens
 import org.mozilla.fenix.helpers.AppAndSystemHelper.assertYoutubeAppOpens
 import org.mozilla.fenix.helpers.AppAndSystemHelper.clickSystemHomeScreenShortcutAddButton
+import org.mozilla.fenix.helpers.Constants
 import org.mozilla.fenix.helpers.Constants.PackageName.GOOGLE_DOCS
 import org.mozilla.fenix.helpers.Constants.PackageName.PRINT_SPOOLER
 import org.mozilla.fenix.helpers.DataGenerationHelper.createCustomTabIntent
@@ -28,9 +30,12 @@ import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
 import org.mozilla.fenix.helpers.MatcherHelper
 import org.mozilla.fenix.helpers.MatcherHelper.itemContainingText
 import org.mozilla.fenix.helpers.MockBrowserDataHelper
+import org.mozilla.fenix.helpers.MockBrowserDataHelper.createBookmarkItem
 import org.mozilla.fenix.helpers.TestAssetHelper.articleSummaryAsset
 import org.mozilla.fenix.helpers.TestAssetHelper.firstForeignWebPageAsset
 import org.mozilla.fenix.helpers.TestAssetHelper.getGenericAsset
+import org.mozilla.fenix.helpers.TestAssetHelper.navigablePageStartAsset
+import org.mozilla.fenix.helpers.TestAssetHelper.navigablePageTargetAsset
 import org.mozilla.fenix.helpers.TestAssetHelper.pdfFormAsset
 import org.mozilla.fenix.helpers.TestAssetHelper.refreshAsset
 import org.mozilla.fenix.helpers.TestAssetHelper.waitingTime
@@ -63,7 +68,6 @@ class MainMenuTest {
         AndroidComposeTestRuleV2(
             HomeActivityIntentTestRule(
                 skipOnboarding = true,
-                isMenuRedesignCFREnabled = false,
                 isPageLoadTranslationsPromptEnabled = false,
                 shakeToSummarizeFeatureFlagEnabled = true,
             ),
@@ -243,6 +247,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080151
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyRecommendedExtensionsListWhileNoExtensionIsInstalledTest"],
+        bug = 2060288,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyRecommendedExtensionsListWhileNoExtensionIsInstalledTest() {
@@ -259,6 +268,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080160
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheExtensionsMenuListAfterRemovingAnExtensionTest"],
+        bug = 2061643,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheExtensionsMenuListAfterRemovingAnExtensionTest() {
@@ -297,6 +311,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080163
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheExtensionsMenuListAfterRemovingAnExtensionTest"],
+        bug = 2061643,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheManageExtensionsItemTest() {
@@ -357,6 +376,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080113
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheAddToHomeScreenSubMenuOptionTest"],
+        bug = 2052183,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheAddToShortcutsSubMenuOptionTest() {
@@ -382,6 +406,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080114
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheAddToHomeScreenSubMenuOptionTest"],
+        bug = 2051566,
+        since = "2026-06",
+    )
     @SmokeTest
     @Test
     fun verifyTheAddToHomeScreenSubMenuOptionTest() {
@@ -406,6 +435,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080115
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheSaveToCollectionSubMenuOptionTest"],
+        bug = 2048584,
+        since = "2026-06",
+    )
     @SmokeTest
     @Test
     fun verifyTheSaveToCollectionSubMenuOptionTest() {
@@ -440,6 +474,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080118
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheSaveAsPDFSubMenuOptionTest"],
+        bug = 2053797,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheSaveAsPDFSubMenuOptionTest() {
@@ -458,6 +497,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080111
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheTranslatePageSubMenuOptionTest"],
+        bug = 2049332,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheTranslatePageSubMenuOptionTest() {
@@ -483,6 +527,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080128
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheShareButtonTest"],
+        bug = 2057218,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheShareButtonTest() {
@@ -495,7 +544,7 @@ class MainMenuTest {
         }.clickShareButton {
             verifyShareTabLayout()
             verifySharingWithSelectedApp(
-                appName = "Gmail",
+                appName = Constants.GMAIL_APP_NAME,
                 content = testPage.url.toString(),
                 subject = testPage.title,
             )
@@ -503,6 +552,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080117
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheOpenInAppSubMenuOptionIsEnabledTest"],
+        bug = 2058136,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheOpenInAppSubMenuOptionIsEnabledTest() {
@@ -520,6 +574,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080131
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyDesktopSiteModeOnOffIsEnabledTest"],
+        bug = 2048234,
+        since = "2026-06",
+    )
     @SmokeTest
     @Test
     fun verifyDesktopSiteModeOnOffIsEnabledTest() {
@@ -546,6 +605,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080119
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyThePrintSubMenuOptionTest"],
+        bug = 2057199,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyThePrintSubMenuOptionTest() {
@@ -562,6 +626,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080156
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheExtensionInstallationTest"],
+        bug = 2062245,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheExtensionInstallationTest() {
@@ -593,6 +662,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080181
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheHomePageSettingsMenuItemTest"],
+        bug = 2062245,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheHomePageSettingsMenuItemTest() {
@@ -602,22 +676,6 @@ class MainMenuTest {
             verifySettingsToolbar()
         }.goBack(composeTestRule) {
             verifyHomeWordmark()
-        }
-    }
-
-    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080121
-    @Ignore("Disabled after enabling the composable toolbar and main menu: https://bugzilla.mozilla.org/show_bug.cgi?id=2006295")
-    @Test
-    fun verifyTheBrowserViewMainMenuCFRTest() {
-        val genericURL = mockWebServer.getGenericAsset(1)
-
-        composeTestRule.activityRule.applySettingsExceptions {
-            it.isMenuRedesignCFREnabled = true
-        }
-        navigationToolbar(composeTestRule) {
-        }.enterURLAndEnterToBrowser(genericURL.url) {
-        }.openThreeDotMenu {
-            verifyMainMenuCFR()
         }
     }
 
@@ -704,6 +762,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080101
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.CustomTabsTest#verifyTheFindInPageMenuItemInACustomTabTest"],
+        bug = 2057409,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheFindInPageMenuItemInACustomTabTest() {
@@ -767,7 +830,67 @@ class MainMenuTest {
         }
     }
 
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/4135485
+    @Test
+    @SkipLeaks(
+        reasons = [
+            "https://bugzilla.mozilla.org/show_bug.cgi?id=2041351",
+        ],
+    )
+    fun verifyTheAddBookmarkMenuItemInACustomTabTest() {
+        val customTabPage = mockWebServer.getGenericAsset(1)
+
+        intentReceiverActivityTestRule.launchActivity(
+            createCustomTabIntent(
+                customTabPage.url.toString(),
+            ),
+        )
+
+        customTabScreen(composeTestRule) {
+        }.openMainMenu {
+            verifyBookmarkThisPageButton()
+            clickBookmarkThisPageButton()
+            verifySnackBarText("Saved in “Bookmarks”")
+            waitUntilSnackbarGone()
+        }.openMainMenu {
+            verifyEditBookmarkButton()
+        }
+    }
+
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/4135486
+    @Ignore("Disabled for recently failing due to race conditions https://bugzilla.mozilla.org/show_bug.cgi?id=2050387")
+    @Test
+    @SkipLeaks(
+        reasons = [
+            "https://bugzilla.mozilla.org/show_bug.cgi?id=2041351",
+        ],
+    )
+    fun verifyTheDeleteBookmarkMenuItemInACustomTabTest() {
+        val customTabPage = mockWebServer.getGenericAsset(1)
+        // presume we have bookmarked the page
+        createBookmarkItem(customTabPage.url.toString(), customTabPage.title, null)
+
+        intentReceiverActivityTestRule.launchActivity(
+            createCustomTabIntent(
+                customTabPage.url.toString(),
+            ),
+        )
+
+        customTabScreen(composeTestRule) {
+        }.openMainMenu {
+            verifyEditBookmarkButton()
+        }.clickEditBookmarkButton {
+            verifyEditBookmarksView()
+            clickDeleteBookmarkButtonInEditMode()
+        }
+    }
+
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080162
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheExtensionMenuListWhileExtensionsAreDisabledTest"],
+        bug = 2062245,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheExtensionMenuListWhileExtensionsAreDisabledTest() {
@@ -820,6 +943,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080112
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheReportBrokenSiteSubMenuOptionTest"],
+        bug = 2060267,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheReportBrokenSiteSubMenuOptionTest() {
@@ -835,6 +963,7 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/2937924
+    @Ignore("https://bugzilla.mozilla.org/show_bug.cgi?id=2053348")
     @Test
     fun verifyTheWhatIsBrokenErrorMessageTest() {
         val defaultWebPage = mockWebServer.getGenericAsset(1)
@@ -847,7 +976,6 @@ class MainMenuTest {
             verifyWebCompatReporterViewItems(defaultWebPage.url.toString())
             verifyWhatIsBrokenField(composeTestRule)
             verifySendButtonIsEnabled(isEnabled = false)
-            clickChooseReasonField(composeTestRule)
             clickSiteDoesNotLoadReason(composeTestRule)
             verifyChooseReasonErrorMessageIsNotDisplayed(composeTestRule)
             verifySendButtonIsEnabled(isEnabled = true)
@@ -855,6 +983,7 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/2937926
+    @Ignore("https://bugzilla.mozilla.org/show_bug.cgi?id=2053348")
     @Test
     fun verifyThatTheBrokenSiteFormSubmissionCanBeCanceledTest() {
         val defaultWebPage = mockWebServer.getGenericAsset(1)
@@ -865,7 +994,6 @@ class MainMenuTest {
             clickTheMoreButton()
         }.clickReportBrokenSiteButton {
             verifyWebCompatReporterViewItems(defaultWebPage.url.toString())
-            clickChooseReasonField(composeTestRule)
             clickSiteDoesNotLoadReason(composeTestRule)
             clickBrokenSiteFormCancelButton(composeTestRule)
         }.openThreeDotMenu {
@@ -876,6 +1004,7 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/2937927
+    @Ignore("https://bugzilla.mozilla.org/show_bug.cgi?id=2053348")
     @Test
     fun verifyTheBrokenSiteFormSubmissionWithOptionalFieldsTest() {
         val defaultWebPage = mockWebServer.getGenericAsset(1)
@@ -886,7 +1015,6 @@ class MainMenuTest {
             clickTheMoreButton()
         }.clickReportBrokenSiteButton {
             verifyWebCompatReporterViewItems(defaultWebPage.url.toString())
-            clickChooseReasonField(composeTestRule)
             clickSiteDoesNotLoadReason(composeTestRule)
             describeBrokenSiteProblem(problemDescription = "Prolonged page loading time")
             clickBrokenSiteFormSendButton(composeTestRule)
@@ -905,6 +1033,7 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/2937930
+    @Ignore("https://bugzilla.mozilla.org/show_bug.cgi?id=2053348")
     @Test
     fun verifyThatTheBrokenSiteFormInfoPersistsTest() {
         val defaultWebPage = mockWebServer.getGenericAsset(1)
@@ -915,7 +1044,6 @@ class MainMenuTest {
             clickTheMoreButton()
         }.clickReportBrokenSiteButton {
             verifyWebCompatReporterViewItems(defaultWebPage.url.toString())
-            clickChooseReasonField(composeTestRule)
             clickSiteDoesNotLoadReason(composeTestRule)
             describeBrokenSiteProblem(problemDescription = "Prolonged page loading time")
         }.closeWebCompatReporter {
@@ -930,6 +1058,7 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/2937931
+    @Ignore("https://bugzilla.mozilla.org/show_bug.cgi?id=2053348")
     @Test
     fun verifyTheBrokenSiteFormIsEmptyWithoutSubmittingThePreviousOneTest() {
         val firstWebPage = mockWebServer.getGenericAsset(1)
@@ -941,7 +1070,6 @@ class MainMenuTest {
             clickTheMoreButton()
         }.clickReportBrokenSiteButton {
             verifyWebCompatReporterViewItems(firstWebPage.url.toString())
-            clickChooseReasonField(composeTestRule)
             clickSiteDoesNotLoadReason(composeTestRule)
             describeBrokenSiteProblem(
                 problemDescription = "Prolonged page loading time",
@@ -962,6 +1090,7 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/2937932
+    @Ignore("https://bugzilla.mozilla.org/show_bug.cgi?id=2053348")
     @Test
     fun verifyThatTheBrokenSiteFormInfoIsErasedWhenKillingTheAppTest() {
         val defaultWebPage = mockWebServer.getGenericAsset(1)
@@ -972,7 +1101,6 @@ class MainMenuTest {
             clickTheMoreButton()
         }.clickReportBrokenSiteButton {
             verifyWebCompatReporterViewItems(defaultWebPage.url.toString())
-            clickChooseReasonField(composeTestRule)
             clickSiteDoesNotLoadReason(composeTestRule)
             describeBrokenSiteProblem(problemDescription = "Prolonged page loading time")
         }
@@ -1146,6 +1274,33 @@ class MainMenuTest {
         }
     }
 
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/4245654
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheMainMenuBackButtonLongPressTest"],
+        bug = 2058469,
+        since = "2026-06",
+    )
+    @SmokeTest
+    @Test
+    fun verifyTheMainMenuBackButtonLongPressTest() {
+        val firstWebPage = mockWebServer.getGenericAsset(1)
+        val nextWebPage = mockWebServer.getGenericAsset(2)
+
+        navigationToolbar(composeTestRule) {
+        }.enterURLAndEnterToBrowser(firstWebPage.url) {
+        }
+        navigationToolbar(composeTestRule) {
+        }.enterURLAndEnterToBrowser(nextWebPage.url) {
+            verifyUrl(nextWebPage.url.toString())
+        }.openThreeDotMenu {
+        }.longClickPreviousPageButton {
+            waitForAppWindowToBeUpdated()
+            verifyTabHistorySheetIsDisplayed(true)
+            verifyTabHistoryContainsWebsite(nextWebPage.url.toString(), true)
+            verifyTabHistoryContainsWebsite(firstWebPage.url.toString(), true)
+        }
+    }
+
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080126
     @Converted(
         replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheMainMenuForwardButtonTest"],
@@ -1175,6 +1330,35 @@ class MainMenuTest {
         }
     }
 
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/4245662
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheMainMenuForwardButtonLongPressTest"],
+        bug = 2058469,
+        since = "2026-06",
+    )
+    @SmokeTest
+    @Test
+    fun verifyTheMainMenuForwardButtonLongPressTest() {
+        val firstWebPage = mockWebServer.getGenericAsset(1)
+        val nextWebPage = mockWebServer.getGenericAsset(2)
+
+        navigationToolbar(composeTestRule) {
+        }.enterURLAndEnterToBrowser(firstWebPage.url) {
+        }
+        navigationToolbar(composeTestRule) {
+        }.enterURLAndEnterToBrowser(nextWebPage.url) {
+            verifyUrl(nextWebPage.url.toString())
+        }.openThreeDotMenu {
+        }.clickPreviousPageButton {
+        }.openThreeDotMenu {
+        }.longClickForwardPageButton {
+            waitForAppWindowToBeUpdated()
+            verifyTabHistorySheetIsDisplayed(true)
+            verifyTabHistoryContainsWebsite(nextWebPage.url.toString(), true)
+            verifyTabHistoryContainsWebsite(firstWebPage.url.toString(), true)
+        }
+    }
+
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080127
     @Test
     fun verifyTheRefreshButtonTest() {
@@ -1190,6 +1374,15 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080134
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheExtensionsMainMenuListTest"],
+        bug = 2060267,
+        since = "2026-08",
+        notes = "Legacy verifyTheRecommendedAddons asserted three named addons, each with its own " +
+            "\"Add <addon>\" install button, retrying against a hardcoded candidate list. The port asserts " +
+            "that a recommended-addon row is present instead, since which addons AMO recommends is " +
+            "server-driven. The per-addon install-button check did not carry over.",
+    )
     @SmokeTest
     @Test
     fun verifyTheExtensionsMainMenuListTest() {
@@ -1207,7 +1400,6 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080135
-    @Ignore("Disabling to ease uplift. See bug 2049060.")
     @Test
     fun verifyTheMoreMainMenuListTest() {
         val firstTestPage = mockWebServer.firstForeignWebPageAsset
@@ -1221,6 +1413,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080137
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheBookmarksMainMenuItemTest"],
+        bug = 2057417,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheBookmarksMainMenuItemTest() {
@@ -1267,6 +1464,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080096
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.CustomTabsTest#verifyTheMainMenuBackButtonFromCustomTabTest"],
+        bug = 2057414,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheMainMenuBackButtonFromCustomTabTest() {
@@ -1292,7 +1494,46 @@ class MainMenuTest {
         }
     }
 
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/4245663
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.CustomTabsTest#verifyTheMainMenuBackButtonLongClickFromCustomTabTest"],
+        bug = 2060267,
+        since = "2026-08",
+    )
+    @SmokeTest
+    @Test
+    fun verifyTheMainMenuBackButtonLongClickFromCustomTabTest() {
+        val customMenuItem = "TestMenuItem"
+        val startPage = mockWebServer.navigablePageStartAsset
+        val targetPage = mockWebServer.navigablePageTargetAsset
+
+        intentReceiverActivityTestRule.launchActivity(
+            createCustomTabIntent(
+                startPage.url.toString(),
+                customMenuItem,
+            ),
+        )
+
+        customTabScreen(composeTestRule) {
+            clickPageObject(composeTestRule, itemContainingText("Go to target page"))
+        }.openMainMenu {
+        }.longClickBackButtonFromMenu {
+            waitForAppWindowToBeUpdated()
+        }
+
+        browserScreen(composeTestRule) {
+            verifyTabHistorySheetIsDisplayed(true)
+            verifyTabHistoryContainsWebsite(startPage.url.toString(), true)
+            verifyTabHistoryContainsWebsite(targetPage.url.toString(), true)
+        }
+    }
+
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080097
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.CustomTabsTest#verifyTheMainMenuForwardButtonFromCustomTabTest"],
+        bug = 2057414,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyTheMainMenuForwardButtonFromCustomTabTest() {
@@ -1391,7 +1632,11 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3080110
-    @Ignore("Disabling to ease uplift. See bug 2049060.")
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.MainMenuTest#verifyTheMoreMainMenuSubListTest"],
+        bug = 2062245,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheMoreMainMenuSubListTest() {
@@ -1406,7 +1651,7 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/4036009
-    @Ignore("Disabling to ease uplift. See bug 2049060.")
+    @Ignore("Will be fixed in bug 2059592")
     @SmokeTest
     @Test
     fun verifyTheMoreMainMenuSummarizePageButtonTest() {
@@ -1427,7 +1672,7 @@ class MainMenuTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/4036011
-    @Ignore("Disabling to ease uplift. See bug 2049060.")
+    @Ignore("Will be fixed in bug 2059592")
     @SmokeTest
     @Test
     fun verifyTheMoreMainMenuSummarizePageButtonFunctionalityTest() {

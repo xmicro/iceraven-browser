@@ -30,6 +30,7 @@ import org.mozilla.fenix.tabstray.TabsTrayTestTag
 import org.mozilla.fenix.tabstray.data.TabGroupTheme
 import org.mozilla.fenix.tabstray.data.TabsTrayItem
 import org.mozilla.fenix.tabstray.data.createTab
+import org.mozilla.fenix.tabstray.redux.state.TabsTrayState.TabGroupState
 import org.mozilla.fenix.theme.FirefoxTheme
 import mozilla.components.ui.icons.R as iconsR
 
@@ -37,15 +38,22 @@ private val EmptyPageWidth = 225.dp
 
 /**
  * UI for displaying the Tab Groups Page in the Tab Manager.
+ *
+ * @param state The current snapshot of [TabGroupState].
+ * @param onTabGroupClick Invoked when a group is clicked.
+ * @param onEditTabGroupClick Invoked when a group is requested to be edited.
+ * @param onShareTabGroupClick Invoked when a group is requested to be shared.
+ * @param onDeleteTabGroupClick Invoked when a group is requested to be deleted.
  */
 @Composable
 internal fun TabGroupsPage(
-    groups: List<TabsTrayItem.TabGroup>,
+    state: TabGroupState,
     onTabGroupClick: (TabsTrayItem.TabGroup) -> Unit,
-    onDeleteTabGroupClick: (TabsTrayItem.TabGroup) -> Unit,
     onEditTabGroupClick: (TabsTrayItem.TabGroup) -> Unit,
+    onShareTabGroupClick: (TabsTrayItem.TabGroup) -> Unit,
+    onDeleteTabGroupClick: (TabsTrayItem.TabGroup) -> Unit,
 ) {
-    if (groups.isNotEmpty()) {
+    if (state.groups.isNotEmpty()) {
         Column {
             BetaLabel(
                 modifier = Modifier.padding(
@@ -55,10 +63,11 @@ internal fun TabGroupsPage(
             )
 
             TabGroupList(
-                groups = groups,
+                groups = state.groups,
                 onTabGroupClick = onTabGroupClick,
-                onDeleteTabGroupClick = onDeleteTabGroupClick,
                 onEditTabGroupClick = onEditTabGroupClick,
+                onShareTabGroupClick = onShareTabGroupClick,
+                onDeleteTabGroupClick = onDeleteTabGroupClick,
             )
         }
     } else {
@@ -156,10 +165,11 @@ private fun TabGroupsPagePreview(
 ) {
     FirefoxTheme {
         TabGroupsPage(
-            groups = groups,
+            state = TabGroupState(groups = groups),
             onTabGroupClick = {},
-            onDeleteTabGroupClick = {},
             onEditTabGroupClick = {},
+            onShareTabGroupClick = {},
+            onDeleteTabGroupClick = {},
         )
     }
 }

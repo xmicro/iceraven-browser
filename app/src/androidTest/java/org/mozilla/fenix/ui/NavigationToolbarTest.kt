@@ -6,9 +6,9 @@
 
 package org.mozilla.fenix.ui
 
-import androidx.core.net.toUri
 import org.junit.Rule
 import org.junit.Test
+import org.mozilla.fenix.customannotations.Converted
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.AppAndSystemHelper.enableOrDisableBackGestureNavigationOnDevice
 import org.mozilla.fenix.helpers.FenixTestRule
@@ -40,7 +40,6 @@ class NavigationToolbarTest {
     val composeTestRule =
         AndroidComposeTestRuleV2(
             HomeActivityIntentTestRule(
-                isPWAsPromptEnabled = false,
                 isWallpaperOnboardingEnabled = false,
                 isOpenInAppBannerEnabled = false,
                 isMicrosurveyEnabled = false,
@@ -54,47 +53,13 @@ class NavigationToolbarTest {
     @get:Rule
     val searchMockServerRule = SearchMockServerRule()
 
-    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3135074
-    @SmokeTest
-    @Test
-    fun verifySecurePageSecuritySubMenuTest() {
-        val defaultWebPage = "https://mozilla-mobile.github.io/testapp/loginForm"
-        val defaultWebPageTitle = "Login_form"
-
-        navigationToolbar(composeTestRule) {
-        }.enterURLAndEnterToBrowser(
-            defaultWebPage.toUri(),
-        ) {
-            verifyPageContent("Login Form")
-        }.openSiteSecuritySheet {
-            verifyQuickActionSheet(defaultWebPage, true)
-            openSecureConnectionSubMenu(true)
-            verifySecureConnectionSubMenu(defaultWebPageTitle, defaultWebPage, true)
-        }
-    }
-
-    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3135075
-    @SmokeTest
-    @Test
-    fun verifyInsecurePageSecuritySubMenuTest() {
-        val defaultWebPage = mockWebServer.getGenericAsset(1)
-
-        navigationToolbar(composeTestRule) {
-        }.enterURLAndEnterToBrowser(defaultWebPage.url) {
-            verifyPageContent(defaultWebPage.content)
-        }.openSiteSecuritySheet {
-            verifyQuickActionSheet(defaultWebPage.url.toString(), false)
-            openSecureConnectionSubMenu(false)
-            verifySecureConnectionSubMenu(
-                defaultWebPage.title,
-                defaultWebPage.url.toString(),
-                false,
-            )
-        }
-    }
-
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/987326
     // Swipes the nav bar left/right to switch between tabs
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarTest#swipeToSwitchTabTest"],
+        bug = 2061612,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun swipeToSwitchTabTest() {
@@ -136,6 +101,11 @@ class NavigationToolbarTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3135067
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.NavigationToolbarTest#verifyTheNewTabButtonTest"],
+        bug = 2061612,
+        since = "2026-08",
+    )
     @SmokeTest
     @Test
     fun verifyTheNewTabButtonTest() {

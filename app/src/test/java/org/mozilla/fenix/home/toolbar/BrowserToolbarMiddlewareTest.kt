@@ -24,6 +24,7 @@ import mozilla.components.browser.state.action.TabListAction.RemoveTabAction
 import mozilla.components.browser.state.search.SearchEngine
 import mozilla.components.browser.state.search.SearchEngine.Type.APPLICATION
 import mozilla.components.browser.state.state.BrowserState
+import mozilla.components.browser.state.state.TranslationsBrowserState
 import mozilla.components.browser.state.state.createTab
 import mozilla.components.browser.state.state.selectedOrDefaultSearchEngine
 import mozilla.components.browser.state.store.BrowserStore
@@ -66,7 +67,6 @@ import org.mozilla.fenix.browser.browsingmode.BrowsingMode.Private
 import org.mozilla.fenix.browser.browsingmode.BrowsingModeManager
 import org.mozilla.fenix.browser.browsingmode.SimpleBrowsingModeManager
 import org.mozilla.fenix.components.AppStore
-import org.mozilla.fenix.components.UseCases
 import org.mozilla.fenix.components.appstate.AppAction
 import org.mozilla.fenix.components.appstate.AppAction.SearchAction.SearchEngineSelected
 import org.mozilla.fenix.components.appstate.AppAction.SearchAction.SearchStarted
@@ -82,7 +82,6 @@ import org.mozilla.fenix.components.usecases.FenixBrowserUseCases
 import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.helpers.FenixGleanTestRule
-import org.mozilla.fenix.home.toolbar.BrowserToolbarMiddleware.Companion.toHomeToolbarAction
 import org.mozilla.fenix.home.toolbar.BrowserToolbarMiddleware.HomeToolbarAction
 import org.mozilla.fenix.home.toolbar.DisplayActions.FakeClicked
 import org.mozilla.fenix.home.toolbar.DisplayActions.MenuClicked
@@ -96,6 +95,7 @@ import org.mozilla.fenix.search.fixtures.assertSearchSelectorEquals
 import org.mozilla.fenix.search.fixtures.buildExpectedSearchSelector
 import org.mozilla.fenix.settings.ShortcutType
 import org.mozilla.fenix.tabstray.redux.state.Page
+import org.mozilla.fenix.translations.TranslationsEnabledSettings
 import org.mozilla.fenix.utils.Settings
 import org.robolectric.Shadows.shadowOf
 import kotlin.test.assertNotNull
@@ -110,8 +110,13 @@ class BrowserToolbarMiddlewareTest {
     @get:Rule
     val gleanRule = FenixGleanTestRule(testContext)
 
-    private val browserStore = BrowserStore()
+    private val browserStore = BrowserStore(
+        BrowserState(translationEngine = TranslationsBrowserState(isEngineSupported = true)),
+    )
     private val browsingModeManager = SimpleBrowsingModeManager(Normal)
+
+    // Translations are available by default: the engine is supported and the feature is enabled.
+    private val translationsFeatureSettings = TranslationsEnabledSettings.inMemory(isEnabledInitial = true)
     private lateinit var appStore: AppStore
 
     @Before
@@ -593,6 +598,77 @@ class BrowserToolbarMiddlewareTest {
     }
 
     @Test
+    fun `GIVEN homepage as a new tab is disabled and expanded toolbar WHEN clicking the new tab button THEN start a new search`() = runTest {
+        every { testContext.components.settings.shouldUseExpandedToolbar } returns true
+        every { testContext.components.settings.enableHomepageAsNewTab } returns false
+        val fenixBrowserUseCases: FenixBrowserUseCases = mockk(relaxed = true)
+        val (_, toolbarStore) = buildMiddlewareAndAddToStore(fenixBrowserUseCases = fenixBrowserUseCases)
+        val newTabButton = toolbarStore.state.displayState.navigationActions[2] as ActionButtonRes
+
+        toolbarStore.dispatch(newTabButton.onClick as BrowserToolbarEvent)
+
+        verify(exactly = 0) { fenixBrowserUseCases.addNewHomepageTab(any(), any(), any()) }
+        verify { appStore.dispatch(SearchStarted()) }
+    }
+
+    @Test
+    fun `GIVEN homepage as a new tab is enabled and expanded toolbar WHEN clicking the new tab button THEN open a new homepage tab`() = runTest {
+        every { testContext.components.settings.shouldUseExpandedToolbar } returns true
+        every { testContext.components.settings.enableHomepageAsNewTab } returns true
+        val browsingModeManager = SimpleBrowsingModeManager(Normal)
+        val fenixBrowserUseCases: FenixBrowserUseCases = mockk(relaxed = true)
+        val (_, toolbarStore) = buildMiddlewareAndAddToStore(
+            fenixBrowserUseCases = fenixBrowserUseCases,
+            browsingModeManager = browsingModeManager,
+        )
+        val newTabButton = toolbarStore.state.displayState.navigationActions[2] as ActionButtonRes
+
+        toolbarStore.dispatch(newTabButton.onClick as BrowserToolbarEvent)
+
+        verify { fenixBrowserUseCases.addNewHomepageTab(private = false) }
+        verify(exactly = 0) { appStore.dispatch(SearchStarted()) }
+        assertEquals(Normal, browsingModeManager.mode)
+    }
+
+    @Test
+    fun `GIVEN homepage as a new tab is enabled and expanded toolbar in private browsing mode WHEN clicking the new tab button THEN open a new private homepage tab`() = runTest {
+        every { testContext.components.settings.shouldUseExpandedToolbar } returns true
+        every { testContext.components.settings.enableHomepageAsNewTab } returns true
+        val browsingModeManager = SimpleBrowsingModeManager(Private)
+        val fenixBrowserUseCases: FenixBrowserUseCases = mockk(relaxed = true)
+        val (_, toolbarStore) = buildMiddlewareAndAddToStore(
+            fenixBrowserUseCases = fenixBrowserUseCases,
+            browsingModeManager = browsingModeManager,
+        )
+        val newTabButton = toolbarStore.state.displayState.navigationActions[2] as ActionButtonRes
+
+        toolbarStore.dispatch(newTabButton.onClick as BrowserToolbarEvent)
+
+        verify { fenixBrowserUseCases.addNewHomepageTab(private = true) }
+        verify(exactly = 0) { appStore.dispatch(SearchStarted()) }
+        assertEquals(Private, browsingModeManager.mode)
+    }
+
+    @Test
+    fun `GIVEN homepage as a new tab is enabled and private browsing mode WHEN clicking on the long click menu option THEN open a new normal homepage tab`() {
+        every { testContext.components.settings.enableHomepageAsNewTab } returns true
+        val browsingModeManager = SimpleBrowsingModeManager(Private)
+        val fenixBrowserUseCases: FenixBrowserUseCases = mockk(relaxed = true)
+        val (_, toolbarStore) = buildMiddlewareAndAddToStore(
+            fenixBrowserUseCases = fenixBrowserUseCases,
+            browsingModeManager = browsingModeManager,
+        )
+        val tabCounterButton = toolbarStore.state.displayState.browserActionsEnd[0] as TabCounterAction
+        val tabCounterMenuItems = (tabCounterButton.onLongClick as CombinedEventAndMenu).menu.items()
+
+        toolbarStore.dispatch((tabCounterMenuItems[0] as BrowserToolbarMenuButton).onClick!!)
+
+        verify { fenixBrowserUseCases.addNewHomepageTab(private = false) }
+        verify(exactly = 0) { appStore.dispatch(SearchStarted()) }
+        assertEquals(Normal, browsingModeManager.mode)
+    }
+
+    @Test
     fun `GIVEN in normal browsing mode WHEN the page origin is clicked THEN start the search UX for normal browsing`() {
         val browsingModeManager = SimpleBrowsingModeManager(Normal)
         val navController: NavController = mockk(relaxed = true)
@@ -646,14 +722,11 @@ class BrowserToolbarMiddlewareTest {
         val clipboard = ClipboardHandler(testContext).also {
             it.text = clipboardUrl
         }
-        val browserUseCases: FenixBrowserUseCases = mockk(relaxed = true)
-        val useCases: UseCases = mockk {
-            every { fenixBrowserUseCases } returns browserUseCases
-        }
+        val fenixBrowserUseCases: FenixBrowserUseCases = mockk(relaxed = true)
         val selectedSearchEngine = appStore.state.searchState.selectedSearchEngine?.searchEngine
         val (_, toolbarStore) = buildMiddlewareAndAddToStore(
             clipboard = clipboard,
-            useCases = useCases,
+            fenixBrowserUseCases = fenixBrowserUseCases,
             navController = navController,
             browsingModeManager = browsingModeManager,
         )
@@ -661,7 +734,7 @@ class BrowserToolbarMiddlewareTest {
         toolbarStore.dispatch(LoadFromClipboardClicked)
 
         verify {
-            browserUseCases.loadUrlOrSearch(
+            fenixBrowserUseCases.loadUrlOrSearch(
                 searchTermOrURL = clipboardUrl,
                 newTab = true,
                 private = false,
@@ -916,31 +989,63 @@ class BrowserToolbarMiddlewareTest {
     }
 
     @Test
-    fun `toHomeToolbarAction maps ShortcutType to HomeToolbarAction`() {
-        assertEquals(
-            HomeToolbarAction.NewTab,
-            ShortcutType.NEW_TAB.toHomeToolbarAction(),
+    fun `toHomeToolbarAction maps ShortcutType to HomeToolbarAction`() = runTest {
+        val (middleware, _) = buildMiddlewareAndAddToStore()
+
+        with(middleware) {
+            assertEquals(
+                HomeToolbarAction.NewTab,
+                ShortcutType.NEW_TAB.toHomeToolbarAction(),
+            )
+            assertEquals(
+                HomeToolbarAction.FakeShare,
+                ShortcutType.SHARE.toHomeToolbarAction(),
+            )
+            assertEquals(
+                HomeToolbarAction.FakeBookmark,
+                ShortcutType.BOOKMARK.toHomeToolbarAction(),
+            )
+            assertEquals(
+                HomeToolbarAction.FakeTranslate,
+                ShortcutType.TRANSLATE.toHomeToolbarAction(),
+            )
+            assertEquals(
+                HomeToolbarAction.FakeHomepage,
+                ShortcutType.HOMEPAGE.toHomeToolbarAction(),
+            )
+            assertEquals(
+                HomeToolbarAction.FakeBack,
+                ShortcutType.BACK.toHomeToolbarAction(),
+            )
+            assertEquals(
+                HomeToolbarAction.FakeSummarize,
+                ShortcutType.SUMMARIZE.toHomeToolbarAction(),
+            )
+        }
+    }
+
+    @Test
+    fun `GIVEN translations is unavailable WHEN mapping the translate shortcut THEN it falls back to the bookmark action`() = runTest {
+        val (middleware, _) = buildMiddlewareAndAddToStore(
+            translationsFeatureSettings = TranslationsEnabledSettings.inMemory(isEnabledInitial = false),
         )
-        assertEquals(
-            HomeToolbarAction.FakeShare,
-            ShortcutType.SHARE.toHomeToolbarAction(),
+
+        val translate = with(middleware) { ShortcutType.TRANSLATE.toHomeToolbarAction() }
+
+        assertEquals(HomeToolbarAction.FakeBookmark, translate)
+    }
+
+    @Test
+    fun `GIVEN expanded toolbar uses the translate shortcut but translations is disabled WHEN initializing toolbar THEN show the bookmark button in navigation actions`() = runTest {
+        every { testContext.components.settings.shouldUseExpandedToolbar } returns true
+        every { testContext.components.settings.toolbarExpandedShortcutKey } returns ShortcutType.TRANSLATE.value
+
+        val (_, toolbarStore) = buildMiddlewareAndAddToStore(
+            translationsFeatureSettings = TranslationsEnabledSettings.inMemory(isEnabledInitial = false),
         )
-        assertEquals(
-            HomeToolbarAction.FakeBookmark,
-            ShortcutType.BOOKMARK.toHomeToolbarAction(),
-        )
-        assertEquals(
-            HomeToolbarAction.FakeTranslate,
-            ShortcutType.TRANSLATE.toHomeToolbarAction(),
-        )
-        assertEquals(
-            HomeToolbarAction.FakeHomepage,
-            ShortcutType.HOMEPAGE.toHomeToolbarAction(),
-        )
-        assertEquals(
-            HomeToolbarAction.FakeBack,
-            ShortcutType.BACK.toHomeToolbarAction(),
-        )
+
+        val primaryButton = toolbarStore.state.displayState.navigationActions.first() as ActionButtonRes
+        assertEquals(expectedBookmarkButton, primaryButton)
     }
 
     private fun buildMiddlewareAndAddToStore(
@@ -948,10 +1053,11 @@ class BrowserToolbarMiddlewareTest {
         appStore: AppStore = this.appStore,
         browserStore: BrowserStore = this.browserStore,
         clipboard: ClipboardHandler = mockk(),
-        useCases: UseCases = mockk(),
+        fenixBrowserUseCases: FenixBrowserUseCases = mockk(),
         navController: NavController = mockk(),
         browsingModeManager: BrowsingModeManager = this.browsingModeManager,
         settings: Settings = testContext.components.settings,
+        translationsFeatureSettings: TranslationsEnabledSettings = this.translationsFeatureSettings,
         isWideScreen: () -> Boolean = { false },
         isTallScreen: () -> Boolean = { true },
     ): Pair<BrowserToolbarMiddleware, BrowserToolbarStore> {
@@ -960,10 +1066,11 @@ class BrowserToolbarMiddlewareTest {
             appStore = appStore,
             browserStore = browserStore,
             clipboard = clipboard,
-            useCases = useCases,
+            fenixBrowserUseCases = fenixBrowserUseCases,
             navController = navController,
             browsingModeManager = browsingModeManager,
             settings = settings,
+            translationsFeatureSettings = translationsFeatureSettings,
             isWideScreen = isWideScreen,
             isTallScreen = isTallScreen,
         )
@@ -979,10 +1086,11 @@ class BrowserToolbarMiddlewareTest {
         appStore: AppStore = this.appStore,
         browserStore: BrowserStore = this.browserStore,
         clipboard: ClipboardHandler = mockk(),
-        useCases: UseCases = mockk(),
+        fenixBrowserUseCases: FenixBrowserUseCases = mockk(),
         navController: NavController = mockk(),
         browsingModeManager: BrowsingModeManager = this.browsingModeManager,
         settings: Settings = testContext.components.settings,
+        translationsFeatureSettings: TranslationsEnabledSettings = this.translationsFeatureSettings,
         isWideScreen: () -> Boolean = { false },
         isTallScreen: () -> Boolean = { true },
     ) = BrowserToolbarMiddleware(
@@ -990,10 +1098,11 @@ class BrowserToolbarMiddlewareTest {
         appStore = appStore,
         browserStore = browserStore,
         clipboard = clipboard,
-        useCases = useCases,
+        fenixBrowserUseCases = fenixBrowserUseCases,
         navController = navController,
         browsingModeManager = browsingModeManager,
         settings = settings,
+        translationsFeatureSettings = translationsFeatureSettings,
         isWideScreen = isWideScreen,
         isTallScreen = isTallScreen,
         scope = testScope,

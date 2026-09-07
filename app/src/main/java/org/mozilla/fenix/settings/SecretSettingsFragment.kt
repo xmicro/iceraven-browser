@@ -41,7 +41,6 @@ import org.mozilla.fenix.ext.components
 import org.mozilla.fenix.ext.requireComponents
 import org.mozilla.fenix.ext.showToolbar
 import org.mozilla.fenix.ext.showToolbarWithIconButton
-import org.mozilla.fenix.home.sports.hasWorldCupEnded
 import org.mozilla.fenix.theme.FirefoxTheme
 import org.mozilla.fenix.utils.SecretSettingsPrefDefaults
 import mozilla.components.ui.icons.R as iconsR
@@ -182,8 +181,19 @@ class SecretSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFra
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
 
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_wayback_machine).apply {
+            isVisible = Config.channel.isNightlyOrDebug
+            isChecked = settings.isWaybackMachineEnabled
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_hide_collections).apply {
+            isChecked = settings.hideCollectionsUi
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
         requirePreference<SwitchPreferenceCompat>(R.string.pref_key_should_show_custom_tab_extensions).apply {
-            isVisible = Config.channel.isDebug
+            isVisible = Config.channel.isNightlyOrDebug
             isChecked = settings.shouldShowCustomTabExtensions
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
@@ -191,6 +201,11 @@ class SecretSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFra
         requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_homepage_as_new_tab).apply {
             isVisible = Config.channel.isNightlyOrDebug
             isChecked = settings.enableHomepageAsNewTab
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_universal_edge_to_edge_wallpapers).apply {
+            isChecked = settings.enableUniversalEdgeToEdgeWallpapers
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
 
@@ -214,18 +229,13 @@ class SecretSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFra
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
 
-        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_merino_manifest).apply {
-            isChecked = settings.enableMerinoManifest
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_homepage_weather_widget).apply {
+            isChecked = settings.enableHomepageWeatherWidget
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
 
-        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_mozilla_ads_client).apply {
-            isChecked = settings.enableMozillaAdsClient
-            onPreferenceChangeListener = SharedPreferenceUpdater()
-        }
-
-        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_unified_trust_panel).apply {
-            isChecked = settings.enableUnifiedTrustPanel
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_ads_client_for_stories).apply {
+            isChecked = settings.enableAdsClientForStories
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
 
@@ -304,16 +314,6 @@ class SecretSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFra
             }
         }
 
-        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_use_new_crash_reporter).apply {
-            isVisible = true
-            isChecked = settings.useNewCrashReporterFlow
-            onPreferenceChangeListener =
-                Preference.OnPreferenceChangeListener { _, newValue ->
-                    settings.useNewCrashReporterFlow = newValue as Boolean
-                    true
-                }
-        }
-
         // for performance reasons, this is only available in Nightly or Debug builds
         requirePreference<EditTextPreference>(R.string.pref_key_custom_glean_server_url).apply {
             isVisible = Config.channel.isNightlyOrDebug && BuildConfig.GLEAN_CUSTOM_URL.isNullOrEmpty()
@@ -363,9 +363,47 @@ class SecretSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFra
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
 
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_ip_protection_locations).apply {
+            isVisible = Config.channel.isNightlyOrDebug
+            isChecked = settings.isIPProtectionLocationsEnabled
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_ip_protection_use_gpi).apply {
+            isVisible = Config.channel.isNightlyOrDebug
+            isChecked = settings.ipProtectionUseGpi
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
         requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_import_passwords).apply {
             isVisible = Config.channel.isDebug
             isChecked = settings.importPasswordsFeatureFlagEnabled
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_uninstall_survey).apply {
+            isVisible = true
+            isChecked = context.components.settings.uninstallSurveyFeatureFlagEnabled
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_oled_theme).apply {
+            isChecked = settings.enableOledTheme
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_pdf_tools).apply {
+            isChecked = settings.enablePdfTools
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_homepage_customization).apply {
+            isChecked = settings.enableHomepageCustomization
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_homepage_trending_recent_search).apply {
+            isChecked = settings.enableHomepageTrendingRecentSearch
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
 
@@ -434,6 +472,12 @@ class SecretSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFra
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
 
+        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_tab_groups_live_reorder).apply {
+            isVisible = Config.channel.isNightlyOrDebug
+            isChecked = settings.tabGroupsLiveReorderEnabled
+            onPreferenceChangeListener = SharedPreferenceUpdater()
+        }
+
         requirePreference<SwitchPreferenceCompat>(R.string.pref_key_tab_groups_onboarding).apply {
             isVisible = Config.channel.isNightlyOrDebug
             isChecked = context.components.settings.tabGroupsOnboardingEnabled
@@ -446,7 +490,7 @@ class SecretSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFra
         }
 
         requirePreference<SwitchPreferenceCompat>(R.string.pref_key_native_share_sheet).apply {
-            isVisible = Config.channel.isNightlyOrDebug
+            isVisible = Config.channel.isNightlyOrDebug || Config.channel.isFork
             isChecked = settings.nativeShareSheetEnabled
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
@@ -465,13 +509,6 @@ class SecretSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFra
         requirePreference<SwitchPreferenceCompat>(R.string.pref_key_show_voice_search_in_display_toolbar).apply {
             isVisible = Config.channel.isNightlyOrDebug
             isChecked = context.components.settings.showVoiceSearchInDisplayToolbar
-            onPreferenceChangeListener = SharedPreferenceUpdater()
-        }
-
-        requirePreference<SwitchPreferenceCompat>(R.string.pref_key_enable_homepage_sports_widget).apply {
-            // Hide the toggle once the World Cup is over — the widget is retired.
-            isVisible = !hasWorldCupEnded()
-            isChecked = settings.enableHomepageSportsWidget
             onPreferenceChangeListener = SharedPreferenceUpdater()
         }
     }
@@ -506,6 +543,10 @@ class SecretSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFra
 
             resources.getString(R.string.pref_key_search_optimization) -> {
                 SecretSettingsFragmentDirections.actionSecretSettingsFragmentToSearchOptimizationFragment()
+            }
+
+            resources.getString(R.string.pref_key_show_debug_info) -> {
+                SecretSettingsFragmentDirections.actionSecretSettingsFragmentToDebugInfoBottomSheetFragment()
             }
 
             else -> return super.onPreferenceTreeClick(preference)

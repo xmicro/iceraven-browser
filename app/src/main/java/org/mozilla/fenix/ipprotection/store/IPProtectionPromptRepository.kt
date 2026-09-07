@@ -46,17 +46,20 @@ interface IPProtectionPromptRepository {
      * the onboarding card again.
      */
     val hasAlreadyUsedIPProtection: Boolean
+
+    /**
+     * Indicates if the Nimbus feature flag for showing the onboarding bottom sheet is enabled.
+     */
+    val showOnboardingBottomSheet: Boolean
 }
 
 /**
  * Default implementation of [IPProtectionPromptRepository].
  *
  * @param settings the preferences settings
- * @param installedTimeMillis returns the application installation timestamp (epoch milliseconds).
  */
 class DefaultIPProtectionPromptRepository(
     private val settings: Settings,
-    private val installedTimeMillis: () -> Long,
 ) : IPProtectionPromptRepository {
 
     override var isShowingPrompt = false
@@ -70,10 +73,17 @@ class DefaultIPProtectionPromptRepository(
     override val hasAlreadyUsedIPProtection: Boolean
         get() = settings.hasAlreadyUsedVpn
 
-    override fun canShowIPProtectionPrompt(currentTimeMillis: Long): Boolean =
-        settings.isIPProtectionAvailable && isInstalledAtLeastAWeekAgo(currentTimeMillis) &&
-            !isShowingPrompt && !hasShownPrompt && !hasAlreadyUsedIPProtection
+    override val showOnboardingBottomSheet: Boolean
+        get() = settings.shouldShowIPProtectionOnboardingBottomSheet
 
-    private fun isInstalledAtLeastAWeekAgo(currentTimeMillis: Long): Boolean =
-        currentTimeMillis - installedTimeMillis() >= ONE_WEEK_MS
+    override fun canShowIPProtectionPrompt(currentTimeMillis: Long): Boolean =
+        showOnboardingBottomSheet &&
+        settings.isIPProtectionAvailable &&
+            completedOnboardingOverAWeekAgo(currentTimeMillis) &&
+            !isShowingPrompt &&
+            !hasShownPrompt &&
+            !hasAlreadyUsedIPProtection
+
+    private fun completedOnboardingOverAWeekAgo(currentTimeMillis: Long): Boolean =
+        currentTimeMillis - settings.onboardingCompletedTimestamp > ONE_WEEK_MS
 }

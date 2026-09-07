@@ -21,12 +21,7 @@ class AdjustMetricsService(private val application: Application) : MetricsServic
 
     override fun start() {}
 
-    override fun stop() {
-        logger.info("Stopped")
-
-        Adjust.disable()
-        Adjust.gdprForgetMe(application.applicationContext)
-    }
+    override fun stop() {}
 
     // We're not currently sending events directly to Adjust
     override fun track(event: Event) { /* noop */ }
@@ -58,6 +53,7 @@ class AdjustMetricsService(private val application: Application) : MetricsServic
         /**
          * Sets third party sharing settings based on distribution and attribution.
          */
+        @Suppress("LongParameterList")
         @VisibleForTesting
         internal fun applyThirdPartySharingSettings(
             distribution: DistributionIdManager.Distribution,
@@ -65,6 +61,9 @@ class AdjustMetricsService(private val application: Application) : MetricsServic
             isUserTikTokAttributed: Boolean,
             isUserRedditAttributed: Boolean,
             isUserXTwitterAttributed: Boolean,
+            isUserMolocoAttributed: Boolean,
+            isUserRakutenAttributed: Boolean,
+            isUserSkyflagAttributed: Boolean,
             controller: ThirdPartySharingController = AdjustThirdPartySharingController(),
         ) {
             /* noop */

@@ -29,14 +29,19 @@ interface TabManagementFeatureHelper {
     val tabGroupsDragAndDropEnabled: Boolean
 
     /**
-     * Determines whether the "Share" button is displayed for tab groups in the tabs tray.
+     * Determines whether the "Ungroup" item is displayed in a tab group's three dot menu.
      */
-    val shareTabGroupEnabled: Boolean
+    val ungroupTabGroupEnabled: Boolean
 
     /**
      * Whether onboarding is enabled for the Tab Groups feature.
      */
     val tabGroupsOnboardingEnabled: Boolean
+
+    /**
+     * Control whether reorder happens live during a drag and drop action for Tab Groups.
+     */
+    val tabGroupsLiveReorderEnabled: Boolean
 }
 
 /**
@@ -53,7 +58,10 @@ data object DefaultTabManagementFeatureHelper : TabManagementFeatureHelper {
     override val tabGroupsDragAndDropEnabled: Boolean
         get() = Config.channel.isDebug || FxNimbus.features.tabGroupsDragAndDrop.value().enabled
 
-    override val shareTabGroupEnabled: Boolean
+    override val tabGroupsLiveReorderEnabled: Boolean
+        get() = FxNimbus.features.tabGroupsLiveReorder.value().enabled
+
+    override val ungroupTabGroupEnabled: Boolean
         get() = false
 
     override val tabGroupsOnboardingEnabled: Boolean

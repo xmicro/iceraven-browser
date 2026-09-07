@@ -278,15 +278,15 @@ fun createInitialSearchFragmentState(
         ),
         showSearchSuggestionsHint = false,
         showClipboardSuggestions = settings.shouldShowClipboardSuggestions,
-        showSearchTermHistory = settings.shouldShowHistorySuggestions,
+        showSearchTermHistory = shouldShowHistorySuggestions(browsingMode, settings),
         showHistorySuggestionsForCurrentEngine = false,
-        showAllHistorySuggestions = settings.shouldShowHistorySuggestions,
+        showAllHistorySuggestions = shouldShowHistorySuggestions(browsingMode, settings),
         showBookmarksSuggestionsForCurrentEngine = false,
-        showAllBookmarkSuggestions = settings.shouldShowBookmarkSuggestions,
+        showAllBookmarkSuggestions = shouldShowBookmarkSuggestions(browsingMode, settings),
         showSyncedTabsSuggestionsForCurrentEngine = false,
-        showAllSyncedTabsSuggestions = settings.shouldShowSyncedTabsSuggestions,
+        showAllSyncedTabsSuggestions = shouldShowSyncedTabsSuggestions(browsingMode, settings),
         showSessionSuggestionsForCurrentEngine = false,
-        showAllSessionSuggestions = true,
+        showAllSessionSuggestions = settings.shouldShowSessionSuggestions,
         showSponsoredSuggestions = browsingMode == BrowsingMode.Normal &&
             settings.enableFxSuggest && settings.showSponsoredSuggestions,
         showNonSponsoredSuggestions = browsingMode == BrowsingMode.Normal &&
@@ -473,13 +473,13 @@ private fun searchStateReducer(state: SearchFragmentState, action: SearchFragmen
                 showSearchSuggestionsFromCurrentEngine =
                     shouldShowSearchSuggestions(action.browsingMode, action.settings),
                 showClipboardSuggestions = action.settings.shouldShowClipboardSuggestions,
-                showSearchTermHistory = action.settings.shouldShowHistorySuggestions,
+                showSearchTermHistory = shouldShowHistorySuggestions(action.browsingMode, action.settings),
                 showHistorySuggestionsForCurrentEngine = false, // we'll show all history
-                showAllHistorySuggestions = action.settings.shouldShowHistorySuggestions,
+                showAllHistorySuggestions = shouldShowHistorySuggestions(action.browsingMode, action.settings),
                 showBookmarksSuggestionsForCurrentEngine = false, // we'll show all bookmarks
-                showAllBookmarkSuggestions = action.settings.shouldShowBookmarkSuggestions,
+                showAllBookmarkSuggestions = shouldShowBookmarkSuggestions(action.browsingMode, action.settings),
                 showSyncedTabsSuggestionsForCurrentEngine = false, // we'll show all synced tabs
-                showAllSyncedTabsSuggestions = action.settings.shouldShowSyncedTabsSuggestions,
+                showAllSyncedTabsSuggestions = shouldShowSyncedTabsSuggestions(action.browsingMode, action.settings),
                 showSessionSuggestionsForCurrentEngine = false, // we'll show all local tabs
                 showSponsoredSuggestions = action.browsingMode == BrowsingMode.Normal &&
                     action.settings.enableFxSuggest && action.settings.showSponsoredSuggestions,
@@ -491,7 +491,7 @@ private fun searchStateReducer(state: SearchFragmentState, action: SearchFragmen
                         action.settings.shouldShowSearchOptimizationSportCard,
                 showFlightsSuggestions = shouldShowCardSuggestions(action.settings) &&
                         action.settings.shouldShowSearchOptimizationFlightCard,
-                showAllSessionSuggestions = true,
+                showAllSessionSuggestions = action.settings.shouldShowSessionSuggestions,
                 showTrendingSearches = shouldShowTrendingSearchSuggestions(
                     browsingMode = action.browsingMode,
                     settings = action.settings,
@@ -505,18 +505,18 @@ private fun searchStateReducer(state: SearchFragmentState, action: SearchFragmen
                 showSearchSuggestionsFromCurrentEngine =
                     shouldShowSearchSuggestions(action.browsingMode, action.settings),
                 showClipboardSuggestions = action.settings.shouldShowClipboardSuggestions,
-                showSearchTermHistory = action.settings.shouldShowHistorySuggestions,
+                showSearchTermHistory = shouldShowHistorySuggestions(action.browsingMode, action.settings),
                 showHistorySuggestionsForCurrentEngine =
-                    action.settings.shouldShowHistorySuggestions && !action.engine.isGeneral,
+                    shouldShowHistorySuggestions(action.browsingMode, action.settings) && !action.engine.isGeneral,
                 showAllHistorySuggestions = false,
                 showBookmarksSuggestionsForCurrentEngine =
-                    action.settings.shouldShowBookmarkSuggestions && !action.engine.isGeneral,
+                    shouldShowBookmarkSuggestions(action.browsingMode, action.settings) && !action.engine.isGeneral,
                 showAllBookmarkSuggestions = false,
                 showSyncedTabsSuggestionsForCurrentEngine =
-                    action.settings.shouldShowSyncedTabsSuggestions && !action.engine.isGeneral,
+                    shouldShowSyncedTabsSuggestions(action.browsingMode, action.settings) && !action.engine.isGeneral,
                 showAllSyncedTabsSuggestions = false,
                 showSessionSuggestionsForCurrentEngine = !action.engine.isGeneral,
-                showAllSessionSuggestions = false,
+                showAllSessionSuggestions = action.settings.shouldShowSessionSuggestions && !action.engine.isGeneral,
                 showSponsoredSuggestions = false,
                 showNonSponsoredSuggestions = false,
                 showStocksSuggestions = false,
@@ -699,3 +699,28 @@ private fun shouldShowCardSuggestions(
     settings: Settings,
 ) = settings.enableFxSuggest && settings.showNonSponsoredSuggestions &&
         settings.isSearchOptimizationEnabled && settings.shouldShowSearchOptimizationCards
+
+
+private fun shouldShowHistorySuggestions(
+    browsingMode: BrowsingMode,
+    settings: Settings
+) = when (browsingMode) {
+    BrowsingMode.Normal -> settings.shouldShowHistorySuggestions
+    BrowsingMode.Private -> settings.shouldShowHistorySuggestions && settings.shouldShowHistorySuggestionsInPrivate
+}
+
+private fun shouldShowBookmarkSuggestions(
+    browsingMode: BrowsingMode,
+    settings: Settings
+) = when (browsingMode) {
+    BrowsingMode.Normal -> settings.shouldShowBookmarkSuggestions
+    BrowsingMode.Private -> settings.shouldShowBookmarkSuggestions && settings.shouldShowBookmarkSuggestionsInPrivate
+}
+
+private fun shouldShowSyncedTabsSuggestions(
+    browsingMode: BrowsingMode,
+    settings: Settings
+) = when (browsingMode) {
+    BrowsingMode.Normal -> settings.shouldShowSyncedTabsSuggestions
+    BrowsingMode.Private -> settings.shouldShowSyncedTabsSuggestions && settings.shouldShowSyncedTabsSuggestionsInPrivate
+}

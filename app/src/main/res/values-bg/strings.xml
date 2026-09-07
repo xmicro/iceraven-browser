@@ -31,6 +31,8 @@
   <string name="history_search_hint">Търсене в историята</string>
   <!-- Placeholder text shown in search bar when using bookmarks search -->
   <string name="bookmark_search_hint">Търсене в отметките</string>
+  <!-- Content description for the toolbar back button while searching bookmarks -->
+  <string name="bookmark_close_search_description">Върнете се и затворете търсенето</string>
   <!-- Placeholder text shown in search bar when using tabs search -->
   <string name="tab_search_hint">Търсене в разделите</string>
   <!-- Placeholder text shown in the search bar when using application search engines -->
@@ -106,12 +108,6 @@
   <string name="open_in_app_cfr_negative_button_text">Прекратяване</string>
   <!-- Private browsing erase action "contextual feature recommendation" (CFR) -->
 
-  <!--
-    Address bar swipe "contextual feature recommendation" (CFR)
-
-    Text for the message displayed in the contextual feature recommendation popup promoting swipe of address bar.
-  -->
-  <string name="address_bar_swipe_cfr_message_2">Плъзнете наляво или надясно лентата с инструменти, за да превключите разделите.</string>
   <!-- Text for the info dialog when camera permissions have been denied but user tries to access a camera feature. -->
   <string name="camera_permissions_needed_message">Необходим е достъп до камерата. Отворете настройките на Android, докоснете разрешения и изберете разрешаване.</string>
   <!-- Text for the positive action button to go to Android Settings to grant permissions. -->
@@ -317,14 +313,6 @@
   <string name="browser_menu_default_banner_dismiss_promotion">Отхвърляне на промоцията</string>
   <!-- Content description (not visible, for screen readers etc.) for recommended extensions in main menu -->
   <string name="browser_menu_recommended_extensions_content_description">Повече информация</string>
-  <!--
-    Menu "contextual feature recommendation" (CFR)
-
-    Text for the title in the contextual feature recommendation popup promoting the menu feature.
-  -->
-  <string name="menu_cfr_title">Ново: обновено меню</string>
-  <!-- Text for the message in the contextual feature recommendation popup promoting the menu feature. -->
-  <string name="menu_cfr_body">Стигайте по-бързо необходимото – от поверително разглеждане до действия по запазване.</string>
   <!--
     Extensions management fragment
 
@@ -666,8 +654,6 @@
   <string name="nova_onboarding_marketing_primary_button_text" tools:ignore="BrandUsage,UnusedResources">Помогнете на Firefox</string>
   <!-- Marketing onboarding primary button text. -->
   <string name="nova_onboarding_marketing_primary_button_text_3">Да</string>
-  <!-- Marketing onboarding primary button text. -->
-  <string name="nova_onboarding_marketing_primary_button_text_2">Разрешаване и продължаване</string>
   <!-- Marketing onboarding secondary button text. -->
   <string name="nova_onboarding_marketing_secondary_button_text" tools:ignore="UnusedResources">Не, благодаря</string>
   <!-- Marketing onboarding secondary button text. -->
@@ -792,40 +778,8 @@
   <string name="preferences_pbm_lock_screen_title">Използвайте заключване на екрана, за да скриете разделите в поверително сърфиране</string>
   <!-- Informs the user how to access the tabs when "Use screen lock to hide tabs in private browsing" is enabled -->
   <string name="preferences_pbm_lock_screen_summary_3">Преглеждане на раздели защитени с вашия пръстов отпечатък, PIN или отключване с лице. Включването на тази функционалност, също предотвратява заснемането и споделянето на екрана.</string>
-  <!-- Label for cookie banner section in quick settings panel. -->
-  <string name="cookie_banner_blocker">Блокиране на банери за бисквитки</string>
   <!-- Preference for removing cookie/consent banners from sites automatically in private mode. See reduce_cookie_banner_summary for additional context. -->
   <string name="preferences_cookie_banner_reduction_private_mode">Блокиране на банери за бисквитки при поверително сърфиране</string>
-  <!-- Text for indicating cookie banner handling is off this site, this is shown as part of the protections panel with the tracking protection toggle -->
-  <string name="reduce_cookie_banner_off_for_site">Изключено за страницата</string>
-  <!-- Text for cancel button indicating that cookie banner reduction is not supported for the current site, this is shown as part of the cookie banner details view. -->
-  <string name="cookie_banner_handling_details_site_is_not_supported_cancel_button">Отказ</string>
-  <!-- Text for request support button indicating that cookie banner reduction is not supported for the current site, this is shown as part of the cookie banner details view. -->
-  <string name="cookie_banner_handling_details_site_is_not_supported_request_support_button_2">Заявяване</string>
-  <!-- Text for title indicating that cookie banner reduction is not supported for the current site, this is shown as part of the cookie banner details view. -->
-  <string name="cookie_banner_handling_details_site_is_not_supported_title_2">Ще заявите ли поддръжка за тази страница?</string>
-  <!-- Label for the snackBar, after the user reports with success a website where cookie banner reducer did not work -->
-  <string name="cookie_banner_handling_report_site_snack_bar_text_2">Заявката е изпратена</string>
-  <!-- Text for indicating cookie banner handling is on this site, this is shown as part of the protections panel with the tracking protection toggle -->
-  <string name="reduce_cookie_banner_on_for_site">Включено за страницата</string>
-  <!-- Text for indicating that a request for unsupported site was sent to Nimbus (it's a Mozilla library for experiments), this is shown as part of the protections panel with the tracking protection toggle -->
-  <string name="reduce_cookie_banner_unsupported_site_request_submitted_2">Заявката за поддръжка е изпратена</string>
-  <!-- Text for indicating cookie banner handling is currently not supported for this site, this is shown as part of the protections panel with the tracking protection toggle -->
-  <string name="reduce_cookie_banner_unsupported_site">Страницата не се поддържа</string>
-  <!-- Title text for a detail explanation indicating cookie banner handling is on this site, this is shown as part of the cookie banner panel in the toolbar. %1$s is a shortened URL of the current site. -->
-  <string name="reduce_cookie_banner_details_panel_title_on_for_site_1">Включване на скриването на банери за бисквитки за %1$s?</string>
-  <!-- Title text for a detail explanation indicating cookie banner handling is off this site, this is shown as part of the cookie banner panel in the toolbar. %1$s is a shortened URL of the current site. -->
-  <string name="reduce_cookie_banner_details_panel_title_off_for_site_1">Изключване на скриването на банери за бисквитки за %1$s?</string>
-  <!-- Title text for a detail explanation indicating cookie banner reducer didn't work for the current site, this is shown as part of the cookie banner panel in the toolbar. %1$s is the name of the app (for example "Firefox"). -->
-  <string name="reduce_cookie_banner_details_panel_title_unsupported_site_request_2">%1$s не може автоматично да отхвърля заявките за бисквитки на този сайт. Можете да изпратите заявка за поддръжка на този сайт в бъдеще.</string>
-  <!-- Long text for a detail explanation indicating what will happen if cookie banner handling is off for a site, this is shown as part of the cookie banner panel in the toolbar. %1$s is the name of the app (for example "Firefox"). -->
-  <string name="reduce_cookie_banner_details_panel_description_off_for_site_1">Изключете и %1$s ще изчисти бисквитките и ще презареди този сайт. Това може да доведе до излизане от профила или изпразване на количките.</string>
-  <!-- Long text for a detail explanation indicating what will happen if cookie banner handling is on for a site, this is shown as part of the cookie banner panel in the toolbar. %1$s is the name of the app (for example "Firefox"). -->
-  <string name="reduce_cookie_banner_details_panel_description_on_for_site_3">Включете и %1$s ще се опита автоматично да откаже всички банери за бисквитки на този сайт.</string>
-  <!-- Title for the cookie banner re-engagement CFR, the placeholder is replaced with app name. %1$s is the name of the app (for example "Firefox"). -->
-  <string name="cookie_banner_cfr_title">%1$s току-що отказа бисквитки вместо вас</string>
-  <!-- Message for the cookie banner re-engagement CFR -->
-  <string name="cookie_banner_cfr_message">По-малко разсейване, по-малко бисквитки, които ви проследяват на този сайт.</string>
   <!-- Description of the preference to enable "HTTPS-Only" mode. -->
   <string name="preferences_https_only_summary">Автоматично се опитва да се свърже със сайтове, използвайки HTTPS протокол за криптиране за повишена сигурност.</string>
   <!-- Summary of https only preference if https only is set to off -->
@@ -870,6 +824,8 @@
   <string name="preferences_toolbar_shortcut">Пряк път към лентата с инструменти</string>
   <!-- Preference for gestures based actions -->
   <string name="preferences_toolbar_select_shortcut">Избор на пряк път</string>
+  <!-- Title of a menu option allowing to change the shortcut button shown in the toolbar -->
+  <string name="toolbar_shortcut_menu_edit_option">Редактиране на пряк път</string>
   <!-- Preference for gestures based actions -->
   <string name="preferences_gestures">Жестове</string>
   <!-- Preference for settings related to visual options -->
@@ -978,6 +934,12 @@
   <string name="notifications_allowed_summary">Разрешено</string>
   <!-- Summary for notification preference indicating notifications are not allowed -->
   <string name="notifications_not_allowed_summary">Забранено</string>
+  <!-- Preference for local network access / nearby devices in Android 17 -->
+  <string name="preferences_local_network_access">Достъп до локална мрежа / Устройства в близост</string>
+  <!-- Summary for local network access preference indicating access is allowed -->
+  <string name="local_network_access_allowed_summary">Разрешено</string>
+  <!-- Summary for local network access preference indicating access is not allowed -->
+  <string name="local_network_access_not_allowed_summary">Забранено</string>
   <!--
     Add-on Permissions
 
@@ -1037,6 +999,8 @@
   <string name="customize_toggle_pocket_sponsored">Платени публикации</string>
   <!-- Title for the opening wallpaper settings screen -->
   <string name="customize_wallpapers">Тапети</string>
+  <!-- Label for the menu item that opens the customize homepage settings screen. -->
+  <string name="browser_menu_customize_homepage">Приспособяване на началната страница</string>
   <!-- Label for the menu item that opens the wallpaper settings screen. -->
   <string name="browser_menu_change_wallpaper">Промяна на тапета</string>
   <!-- Title for the customize home screen section with sponsored shortcuts. -->
@@ -1167,6 +1131,8 @@
   <string name="extension_process_crash_dialog_retry_button_text" tools:ignore="UnusedResources">Опитайте да рестартирате разширенията</string>
   <!-- Button text on the extension crash dialog to prompt the user to continue with all extensions disabled. -->
   <string name="extension_process_crash_dialog_disable_extensions_button_text">Продължаване с изключени добавки</string>
+  <!-- Text shown in the snackbar action button that lets the user retry an add-on operation that just failed. -->
+  <string name="addon_failure_retry_action">Повторен опит</string>
   <!--
     Account Preferences
 
@@ -1340,6 +1306,11 @@
   <string name="preference_light_theme">Светла</string>
   <!-- Preference for using dark theme -->
   <string name="preference_dark_theme">Тъмна</string>
+  <!--
+    Preference for using the OLED theme. For localization, this can be translated as "True Black", "Maximum Darkness",
+    or "Full dark" if needed.
+  -->
+  <string name="preference_oled_theme">Най-тъмните</string>
   <!-- Preference for using using dark or light theme automatically set by battery -->
   <string name="preference_auto_battery_theme">Зададена от приложение за пестене на батерия</string>
   <!-- Preference for using following device theme -->
@@ -1486,6 +1457,16 @@
   <string name="preferences_inactive_tabs">Преместване на старите раздели в неактивни</string>
   <!-- Title of inactive tabs preference -->
   <string name="preferences_inactive_tabs_title">Разделите, които не сте преглеждали последните две седмици, се преместват в секцията за неактивни.</string>
+  <!-- Title for the preference to enable or disable the tab groups feature -->
+  <string name="preferences_tab_groups_feature">Включване на Групи раздели</string>
+  <!--
+    Privacy report
+
+    Category header of a preference that allows a user to enable or disable the privacy report feature
+  -->
+  <string name="preferences_privacy_report">Доклад за поверителност</string>
+  <!-- Title of the privacy report preference that allows a user to enable or disable the feature -->
+  <string name="preferences_privacy_report_title">Включване на доклад за поверителност</string>
   <!--
     Studies
 
@@ -1700,6 +1681,36 @@
   <string name="close_tab_and_delete_group_confirmation_dialog_confirm">Премахване на групата</string>
   <!-- Text shown on the cancel button in the Close last tab and delete tab group confirmation dialog. -->
   <string name="close_tab_and_delete_group_confirmation_dialog_cancel">Отказ</string>
+  <!-- Content description for the three dot button next to a tab group" -->
+  <string name="tab_group_three_dot_button_content_description">Повече настройки</string>
+  <!-- Text shown on the edit button for a tab group on the three dot menu -->
+  <string name="tab_group_three_dot_menu_edit">Редактиране</string>
+  <!-- Text shown on the ungroup button for a tab group on the three dot menu -->
+  <string name="tab_group_three_dot_menu_ungroup">Разгрупиране</string>
+  <!-- Text shown on the delete button for a tab group on the three dot menu -->
+  <string name="tab_group_three_dot_menu_delete">Изтриване</string>
+  <!-- Text shown on the share button for a tab group on the three dot menu -->
+  <string name="tab_group_three_dot_menu_share">Споделяне</string>
+  <!-- Text shown on the close button for a tab group on the three dot menu -->
+  <string name="tab_group_three_dot_menu_close">Затваряне</string>
+  <!-- Title for the Ungroup tab group confirmation dialog. -->
+  <string name="ungroup_tab_group_confirmation_dialog_title">Разгрупиране на група раздели?</string>
+  <!-- Text shown in the body of the Ungroup tab group confirmation dialog. -->
+  <string name="ungroup_tab_group_confirmation_dialog_body">Разделите ще останат отворени на това устройство, но групата ще бъде премахната.</string>
+  <!-- Text shown on the Don't Ask Again checkbox button in the Ungroup tab group confirmation dialog. -->
+  <string name="ungroup_tab_group_confirmation_dialog_dont_ask_again">Спиране на този въпрос</string>
+  <!-- Text shown on the confirm button in the Ungroup tab group confirmation dialog. -->
+  <string name="ungroup_tab_group_confirmation_dialog_confirm">Разгрупиране</string>
+  <!-- Text shown on the cancel button in the Ungroup tab group confirmation dialog. -->
+  <string name="ungroup_tab_group_confirmation_dialog_cancel">Отказ</string>
+  <!-- Custom accessibility action to reorder a tab up rather than dragging. -->
+  <string name="custom_accessibility_action_reorder_tab_up">Преместване на раздела нагоре</string>
+  <!-- Custom accessibility action to reorder a tab left rather than dragging. -->
+  <string name="custom_accessibility_action_reorder_tab_left">Преместване на раздела вляво</string>
+  <!-- Custom accessibility action to reorder a tab right rather than dragging. -->
+  <string name="custom_accessibility_action_reorder_tab_right">Преместване на раздела вдясно</string>
+  <!-- Custom accessibility action to reorder a tab down rather than dragging. -->
+  <string name="custom_accessibility_action_reorder_tab_down">Преместване на раздела надолу</string>
   <!--
     Color labels for tab groups, used for accessibility and selection UI.
 
@@ -1714,8 +1725,6 @@
   <string name="tab_group_color_pink">Розово</string>
   <!-- Tab group color: Purple -->
   <string name="tab_group_color_purple">Лилаво</string>
-  <!-- Tab group color: Violet -->
-  <string name="tab_group_color_violet">Виолетов</string>
   <!-- Tab group color: Blue -->
   <string name="tab_group_color_blue">Синьо</string>
   <!-- Tab group color: Cyan -->
@@ -1732,8 +1741,6 @@
   <string name="history_search_1">Въведете търсене</string>
   <!-- Text for the button to clear all history -->
   <string name="history_delete_all">Изчистване на история</string>
-  <!-- Text for the snackbar to confirm that multiple browsing history items has been deleted -->
-  <string name="history_delete_multiple_items_snackbar">Историята е изчистена</string>
   <!-- Text for the snackbar to confirm that a single browsing history item has been deleted. %1$s is the shortened URL of the deleted history item. -->
   <string name="history_delete_single_item_snackbar">Изтрито %1$s</string>
   <!-- Context description text for the button to delete a single history item -->
@@ -1977,36 +1984,18 @@
   <string name="webcompat_reporter_description_error">Моля, въведете поне 10 знака</string>
   <!-- The label/title of a mandatory field in the Web Compat Reporter feature for adding additional information. -->
   <string name="webcompat_reporter_label_mandatory_description">Опишете проблема подробно, за да ни помогнете да го изследваме</string>
-  <!-- The label/title of a field in the Web Compat Reporter feature for explaining a high-level reason why the site is broken. -->
-  <string name="webcompat_reporter_label_whats_broken_2">Какво е повредено?</string>
-  <!-- The placeholder text for the dropdown where a user selects a high-level reason why the site is broken. -->
-  <string name="webcompat_reporter_choose_reason_2">Изберете причина</string>
-  <!-- The error message of the dropdown, prompting the user to select a high-level reason why the site is broken. -->
-  <string name="webcompat_reporter_choose_reason_error">Моля, изберете причина</string>
-  <!-- The label/title of an optional field in the Web Compat Reporter feature for adding additional information. -->
-  <string name="webcompat_reporter_label_description_2">Опишете проблема подробно, за да ни помогнете да го разследваме (по избор)</string>
-  <!-- The label/title of an optional field in the Web Compat Reporter feature for adding additional information. -->
-  <string name="webcompat_reporter_label_description">Опишете проблема (по избор)</string>
-  <!-- The button text for navigating away from the feature to provide more information on the broken site's bug report. -->
-  <string name="webcompat_reporter_add_more_info">Добавяне на повече информация</string>
+  <!-- The label/title of a optional field in the Web Compat Reporter feature for adding additional information. -->
+  <string name="webcompat_reporter_label_optional_description">Опишете проблема подробно, за да ни помогнете да го разследваме (по избор)</string>
   <!-- The button text for the cancel button to leave the Web Compat Reporter feature. -->
   <string name="webcompat_reporter_cancel">Отказ</string>
   <!-- The button text for the send button to submit the provided form data. -->
   <string name="webcompat_reporter_send_report">Изпращане на доклад</string>
-  <!-- The button text for the send button to submit the provided form data. -->
-  <string name="webcompat_reporter_send">Изпращане</string>
   <!-- Text for a snackbar to confirm the successful submission of a WebCompat report. -->
   <string name="webcompat_reporter_success_snackbar_text_2">Докладът е изпратен</string>
   <!-- Placeholder text for the description field to prompt the user on what they should type. -->
   <string name="webcompat_reporter_problem_description_placeholder_text_2">Какво се случи? Какво очаквахте да се случи? Моля, посочете стъпки за възпроизвеждане на проблема.</string>
-  <!-- Placeholder text for the description field to prompt the user on what they should type. -->
-  <string name="webcompat_reporter_problem_description_placeholder_text">Какво се случи? Какво трябваше да се случи?</string>
   <!-- Label of the checkbox on the “Report broken site” screen for sending URLS blocked by Enhanced Tracking Protection. -->
   <string name="webcompat_reporter_etp_checkbox_text_2">Изпращане на списък с елементи, блокирани от защитата за проследяване</string>
-  <!-- Label of the checkbox on the “Report broken site” screen for sending URLS blocked by Enhanced Tracking Protection. -->
-  <string name="webcompat_reporter_etp_checkbox_text">Изпращане на адреси, блокирани от защитата от проследяване</string>
-  <!-- Description text for the checkbox on the “Report broken site” screen for sending URLS blocked by Enhanced Tracking Protection. It informs the user when checked, the report will include the list of URLs that were blocked by Enhanced Tracking Protection on the current page. -->
-  <string name="webcompat_reporter_etp_checkbox_description">Подобрена защита от проследяване може да блокира проследяващите скриптове, от които някои уебсайтове се нуждаят, за да работят правилно.</string>
   <!-- The button text for the preview report button to view a preview of the report. -->
   <string name="webcompat_reporter_preview_report">Доклад за предварителните прегледи</string>
   <!-- The title shown at the top of the WebCompat Report preview panel. This appears after the user taps the “Preview” button before sending a report. -->
@@ -2041,8 +2030,6 @@
   <string name="webcompat_reporter_reason_notsupported_2">Браузърът не се поддържа или е блокиран</string>
   <!-- Broken site reason text for the site being deceptive -->
   <string name="webcompat_reporter_reason_site_is_deceptive">Този сайт е заблуждаващ</string>
-  <!-- Broken site reason text for browser isn’t supported or blocked -->
-  <string name="webcompat_reporter_reason_notsupported">Четецът не се поддържа или е блокиран</string>
   <!-- Broken site reason text for something else -->
   <string name="webcompat_reporter_reason_other">Нещо друго</string>
   <!--
@@ -2204,18 +2191,16 @@
   <string name="bookmark_select_folder_new_folder_button_title">Нова папка</string>
   <!-- Bookmark snackbar message for moving a single item. %1$s is the title of the item being moved and %2$s is the new parent folder of the bookmark -->
   <string name="bookmark_moved_single_item">Преместване на %1$s в %2$s</string>
+  <!-- Text for bookmark search page when there are no results. -->
+  <string name="bookmark_no_search_results">Не са намерени съвпадения.</string>
+  <!-- Additional text for bookmark search page when there are no results. -->
+  <string name="bookmark_no_search_results_additional_text">Опитайте с друго търсене!</string>
   <!--
     Site Permissions
 
     Button label that take the user to the Android App setting
   -->
   <string name="phone_feature_go_to_settings">Към настройките</string>
-  <!--
-    Content description (not visible, for screen readers etc.): Quick settings sheet
-    to give users access to site specific information / settings. For example:
-    Secure settings status and a button to modify site permissions
-  -->
-  <string name="quick_settings_sheet">Списък с бързи настройки</string>
   <!-- Label that indicates that this option it the recommended one -->
   <string name="phone_feature_recommended">Препоръчително</string>
   <!-- Button label for clearing all the information of site permissions -->
@@ -2405,6 +2390,10 @@
   <string name="sync_sign_in">Вписване в Sync</string>
   <!-- An option from the share dialog to send link to all other sync devices -->
   <string name="sync_send_to_all">Изпращане до всички устройства</string>
+  <!-- Text displayed when no other sync devices are available for link sharing -->
+  <string name="sync_no_devices_available">Няма налични устройства</string>
+  <!-- Text displayed when no other sync devices are available for link sharing. -->
+  <string name="sync_no_devices_available_description">Всички устройства, на които сте влезли и синхронизирани с този профил, ще се покажат тук.</string>
   <!-- An option from the share dialog to reconnect to sync -->
   <string name="sync_reconnect">Повторно свързване със Sync</string>
   <!-- Text displayed when sync is offline and cannot be accessed -->
@@ -2608,12 +2597,6 @@
   <!--
     Enhanced Tracking Protection
 
-    Link displayed in enhanced tracking protection panel to access tracking protection settings
-  -->
-  <string name="etp_settings">Настройки на защитата</string>
-  <!--
-    Enhanced Tracking Protection
-
     Preference title for enhanced tracking protection settings
   -->
   <string name="preference_enhanced_tracking_protection">Подобрена защита от проследяване</string>
@@ -2631,15 +2614,6 @@
     -->
     <item quantity="one">%d тракер е спрян</item>
     <item quantity="other">%d тракера са блокирани</item>
-  </plurals>
-  <plurals name="trackers_blocked_count">
-    <!--
-      Trackers blocked card on homepage
-
-      Text shown on the trackers blocked card. %d is the number of trackers blocked.
-    -->
-    <item quantity="one">%d Тракерът е спрян</item>
-    <item quantity="other">%d блокирани проследявания</item>
   </plurals>
   <!-- Text shown on the trackers blocked card when no trackers have been blocked yet -->
   <string name="trackers_blocked_empty">Вие сте защитени</string>
@@ -2713,12 +2687,8 @@
   <string name="preference_enhanced_tracking_protection_custom_cryptominers">Добиване на криптовалути</string>
   <!-- Preference for enhanced tracking protection for the custom protection settings -->
   <string name="preference_enhanced_tracking_protection_custom_known_fingerprinters">Известни цифрови отпечатъци</string>
-  <!-- Button label for navigating to the Enhanced Tracking Protection details -->
-  <string name="enhanced_tracking_protection_details">Подробности</string>
   <!-- Header for categories that are being being blocked by current Enhanced Tracking Protection settings -->
   <string name="enhanced_tracking_protection_blocked">Забраняване</string>
-  <!-- Header for categories that are being not being blocked by current Enhanced Tracking Protection settings -->
-  <string name="enhanced_tracking_protection_allowed">Разрешено</string>
   <!-- Category of trackers (social media trackers) that can be blocked by Enhanced Tracking Protection -->
   <string name="etp_social_media_trackers_title">Проследяване от социални мрежи</string>
   <!-- Description of social media trackers that can be blocked by Enhanced Tracking Protection -->
@@ -2741,10 +2711,6 @@
   <string name="etp_tracking_content_title">Проследяващо съдържание</string>
   <!-- Description of tracking content that can be blocked by Enhanced Tracking Protection -->
   <string name="etp_tracking_content_description">Спира зареждането на външни реклами, видео и друго съдържание, съдържащо проследяващ код. Може да засегне някои страници.</string>
-  <!-- Enhanced Tracking Protection message that protection is currently on for this site -->
-  <string name="etp_panel_on">Защитите са ВКЛЮЧЕНИ за този сайт</string>
-  <!-- Enhanced Tracking Protection message that protection is currently off for this site -->
-  <string name="etp_panel_off">Защитите са ИЗКЛЮЧЕНИ за този сайт</string>
   <!-- Header for exceptions list for which sites enhanced tracking protection is always off -->
   <string name="enhanced_tracking_protection_exceptions">Подобрената защита от проследяване е изключена за тези сайтове</string>
   <!--
@@ -2769,13 +2735,6 @@
   <string name="etp_suspected_fingerprinters_description">Активира защита от цифрови отпечатъци и спирането им.</string>
   <!-- Category of trackers (fingerprinters) that can be blocked by Enhanced Tracking Protection -->
   <string name="etp_known_fingerprinters_title">Известни цифрови отпечатъци</string>
-  <!--
-    Description of the SmartBlock Enhanced Tracking Protection feature. The * symbol is intentionally hardcoded here,
-    as we use it on the UI to indicate which trackers have been partially unblocked.
-  -->
-  <string name="preference_etp_smartblock_description">Някои проследявания, отбелязани по-долу, са частично деблокирани на страницата, защото сте взаимодействали с тях *.</string>
-  <!-- Text displayed that links to website about enhanced tracking protection SmartBlock -->
-  <string name="preference_etp_smartblock_learn_more">Научете повече</string>
   <!--
     Content description (not visible, for screen readers etc.):
     Enhanced tracking protection exception preference icon for ETP settings.
@@ -3110,6 +3069,10 @@
   <string name="ip_protection_toolbar_pill_label">VPN включен</string>
   <!-- Accessibility description for the browser VPN pill in the address bar when the VPN has been activated -->
   <string name="ip_protection_toolbar_pill_description">VPN е активен.</string>
+  <!-- Label shown next to the browser protection icon in the address bar when the browser VPN turns off -->
+  <string name="ip_protection_toolbar_pill_label_off">VPN изключен</string>
+  <!-- Accessibility description for the browser VPN pill in the address bar when the VPN has turned off -->
+  <string name="ip_protection_toolbar_pill_description_off">VPN е изключен.</string>
   <!-- Label for the button that starts the browser VPN authentication or authorization flow on the settings screen -->
   <string name="ip_protection_get_started">Въведение</string>
   <!-- Label for the "connecting" state of the button that starts the browser VPN authentication or authorization flow on the settings screen -->
@@ -3143,6 +3106,40 @@
   <string name="ip_protection_data_limit_reached_snackbar">Използвани %1$d GB VPN данни. Достъпът ще бъде нулиран следващия месец.</string>
   <!-- Snackbar (in-app pop-up notification) action button text that takes the user to the VPN settings screen. -->
   <string name="ip_protection_data_limit_reached_snackbar_action">Настройки</string>
+  <!-- Description shown on the browser VPN settings screen prompting the user to turn the VPN on. -->
+  <string name="ip_protection_settings_description" tools:ignore="UnusedResources">Включете VPN, за да направите сърфирането си по-поверително и по-трудно за проследяване.</string>
+  <!-- Title shown on the browser VPN settings screen for location selection section. -->
+  <string name="ip_protection_location_title" tools:ignore="UnusedResources">Местоположение</string>
+  <!-- Label for the Recommended server location option which is automatically selected by the browser. -->
+  <string name="ip_protection_recommended_location" tools:ignore="UnusedResources">Препоръчани</string>
+  <!-- Headline for the card that promotes the standalone Mozilla VPN product. -->
+  <string name="ip_protection_mozilla_vpn_upsell_headline" tools:ignore="UnusedResources,BrandUsage">Защитете повече с Mozilla VPN</string>
+  <!-- Body for the card that promotes the standalone Mozilla VPN product. -->
+  <string name="ip_protection_mozilla_vpn_upsell_body" tools:ignore="UnusedResources">Изберете измежду 300+ местоположения и защитете всичките си приложения на до 5 устройства.</string>
+  <!-- Label for the button that takes the user to get the standalone Mozilla VPN product. -->
+  <string name="ip_protection_mozilla_vpn_upsell_button" tools:ignore="UnusedResources,BrandUsage">Вземете Mozilla VPN</string>
+  <!-- Title for the browser VPN location picker screen. -->
+  <string name="ip_protection_location_picker_title" tools:ignore="UnusedResources">Изберете VPN местоположение</string>
+  <!-- Description for what it means to use the Recommended setting and let the app automatically pick the best server location. -->
+  <string name="ip_protection_location_fastest_description" tools:ignore="BrandUsage">Firefox намира най-бързото местоположение</string>
+  <!-- Description for an unavailable VPN location in the location list. -->
+  <string name="ip_protection_location_unavailable_description">Зает</string>
+  <!-- Error message shown when the selected browser VPN location is unavailable. -->
+  <string name="ip_protection_location_unavailable" tools:ignore="UnusedResources">Местоположението не е налично. Изберете друго местоположение.</string>
+  <!-- Snackbar (in-app pop-up notification) text shown when the previously selected browser VPN location is unavailable and the recommended location was used instead. -->
+  <string name="ip_protection_location_unavailable_recommended_snackbar" tools:ignore="UnusedResources">Избраното VPN местоположение не е налично. Свързан към препоръчаното местоположение.</string>
+  <!-- Title for the card shown to the user when we are unable to fetch server locations -->
+  <string name="ip_protection_locations_unavailable_title">Местоположенията са недостъпни</string>
+  <!-- Description for the card shown to the user when we are unable to fetch server locations -->
+  <string name="ip_protection_locations_unavailable_description">Превключено към препоръчаното местоположение.</string>
+  <!-- Title for the browser VPN location selection screen (displayed in the app bar) -->
+  <string name="ip_protection_locations_title">Изберете местоположение на VPN</string>
+  <!-- Content description for the browser VPN location selection screen top bar back button -->
+  <string name="ip_protection_locations_navigate_back_button_content_description">Връщане назад</string>
+  <!-- Title for the card shown to the user when we are unable to fetch server locations -->
+  <string name="ip_protection_location_unavailable_title" tools:ignore="UnusedResources">Предишното местоположение е недостъпно</string>
+  <!-- Description for the card shown to the user when we are unable to fetch server locations -->
+  <string name="ip_protection_location_unavailable_recommended_description" tools:ignore="UnusedResources">Свързан към препоръчаното местоположение.</string>
   <!--
     Autofill
 
@@ -3295,8 +3292,6 @@
   <string name="addresses_save_button">Запазване</string>
   <!-- The text for the "Cancel" button for cancelling adding, updating or deleting an address -->
   <string name="addresses_cancel_button">Отказ</string>
-  <!-- The text for the "Delete address" button for deleting an address -->
-  <string name="addressess_delete_address_button">Премахване на адреса</string>
   <!-- The title for the "Delete address" confirmation dialog -->
   <string name="addressess_confirm_dialog_message_2">Изтриване на този адрес?</string>
   <!-- The text for the positive button on "Delete address" dialog -->
@@ -3351,16 +3346,8 @@
   <string name="phone_feature_blocked_step_permissions"><![CDATA[2. Докоснете <b>Разрешения</b>]]></string>
   <!-- Third step for the allowing a permission (%1$s is the permission name, for example "Camera"). -->
   <string name="phone_feature_blocked_step_feature"><![CDATA[3. Превключете <b>%1$s</b> в положение ВКЛЮЧЕНО]]></string>
-  <!-- Label that indicates a site is using a secure connection -->
-  <string name="quick_settings_sheet_secure_connection_2">Връзката е защитена</string>
-  <!-- Label that indicates a site is using a insecure connection -->
-  <string name="quick_settings_sheet_insecure_connection_2">Връзката не е защитена</string>
-  <!-- Label that indicates a site is displaying a local document -->
-  <string name="quick_settings_sheet_local_page">Тази страница е запазена на устройството ви.</string>
   <!-- Label to clear site data -->
   <string name="clear_site_data">Изчистване на бисквитките и данните на сайта</string>
-  <!-- Confirmation message for a dialog confirming if the user wants to delete all data for current site. %s is the domain of the site. -->
-  <string name="confirm_clear_site_data"><![CDATA[Сигурни ли сте, че искате да изчистите всички бисквитки и данни на сайта <b>%s</b>?]]></string>
   <!-- Confirmation message for a dialog confirming if the user wants to delete all the permissions for all sites -->
   <string name="confirm_clear_permissions_on_all_sites">Сигурни ли сте, че искате да премахнете всички права за всички страници?</string>
   <!-- Confirmation message for a dialog confirming if the user wants to delete all the permissions for a site -->
@@ -3373,11 +3360,6 @@
   <string name="browser_menu_add_to_shortcuts">Добавяне към преки пътища</string>
   <!-- Browser menu button that removes a shortcut from the home fragment -->
   <string name="browser_menu_remove_from_shortcuts">Премахване от преките пътища</string>
-  <!--
-    text shown before the issuer name to indicate who its verified by, %1$s is the name of
-    the certificate authority that verified the ticket
-  -->
-  <string name="certificate_info_verified_by">Проверено от: %1$s</string>
   <!-- Message in delete confirmation dialog for password -->
   <string name="login_deletion_confirmation_2">Сигурни ли сте, че искате да изтриете тази парола?</string>
   <!-- Positive action of a dialog asking to delete -->
@@ -3441,6 +3423,16 @@
     which navigates the user to a screen displaying all the shortcuts.
   -->
   <string name="homepage_shortcuts_show_all_content_description">Показване на всички преки пътища</string>
+  <!--
+    Label for the button in the shortcuts home screen section that expands the section to show
+    every shortcut.
+  -->
+  <string name="homepage_shortcuts_show_all">Показване на всички</string>
+  <!--
+    Label for the button in the shortcuts home screen section that collapses the section back
+    to showing only the first shortcuts.
+  -->
+  <string name="homepage_shortcuts_show_less">По-малко</string>
   <!-- Label for the "Add shortcut" button displayed as a tile. -->
   <string name="homepage_shortcuts_add_shortcut">Добавете пряк път</string>
   <!-- Title for the "Add to homepage" bottom sheet. -->
@@ -3851,8 +3843,6 @@
     and there are no trackers blocked.
   -->
   <string name="protection_panel_banner_protected_no_blocked_trackers_description">Вие сте защитени.</string>
-  <!-- Description text for the protection panel banner when tracking protection is enabled. -->
-  <string name="protection_panel_banner_protected_description">Защитени сте. Ако забележим нещо, ще ви уведомим.</string>
   <!-- Label text for the Enhanced Tracking Protection toggle. -->
   <string name="protection_panel_etp_toggle_label">Подобрена защита от проследяване</string>
   <!-- Toggle if Enhanced Tracking Protection is turned on -->
@@ -3868,8 +3858,6 @@
     %d is a placeholder for the number of trackers blocked.
   -->
   <string name="protection_panel_num_trackers_blocked">Спряни проследявания: %d</string>
-  <!-- Text for when no trackers have been blocked. -->
-  <string name="protection_panel_no_trackers_blocked">Не са намерени проследяващи програми</string>
   <!-- Text for when tracking protection is disabled and no trackers are blocked. -->
   <string name="protection_panel_etp_disabled_no_trackers_blocked">Проследяванията не са блокирани</string>
   <!-- Link text to navigate to privacy and security settings from the protection panel. -->
@@ -3932,17 +3920,6 @@
     <item quantity="one">%1$d тракер е спрян тази седмица</item>
     <item quantity="other">%1$d тракера са блокирани тази седмица</item>
   </plurals>
-  <!--
-    Text for displaying the total number of trackers blocked in the trackers blocked panel.
-    %d is a placeholder for the number of trackers blocked.
-  -->
-  <string name="trackers_blocked_panel_total_num_trackers_blocked">Спряни проследяващи програми : %d</string>
-  <!--
-    Text for displaying the number of trackers blocked for a specific tracker category in the trackers blocked panel.
-    %s is a placeholder for the name of the tracker category.
-    %d is a placeholder for the number of trackers blocked.
-  -->
-  <string name="trackers_blocked_panel_categorical_num_trackers_blocked">%s: %d</string>
   <!--
     Description text for a dialog confirming whether the user wants to delete all data for current site.
     %s is a placeholder for the base domain of website.
@@ -4687,6 +4664,16 @@
   <string name="privacy_notice_updated_homepage_message_privacy_notice" tools:ignore="UnusedResources">Политика на поверителност</string>
   <!-- The second active link used in privacy_notice_updated_homepage_message -->
   <string name="privacy_notice_updated_homepage_message_learn_more" tools:ignore="UnusedResources">Научете повече</string>
+  <!--
+    Collections migration homepage card
+
+    Title shown on the collections to tab groups migration card on the homepage.
+  -->
+  <string name="collections_migration_homepage_banner_title">Списъците вече са групи</string>
+  <!-- Message shown on the collections to tab groups migration card on the homepage. -->
+  <string name="collections_migration_homepage_card_message">Има по-лесен начин да държите разделите си организирани</string>
+  <!-- Link text shown on the collections to tab groups migration card that opens the tab groups page in the tab manager. -->
+  <string name="collections_migration_homepage_card_link">Преглед на групите от раздели</string>
   <!-- Google Lens prototype related strings -->
   <string name="preferences_debug_settings_google_lens_integration">Активиране на интегрирането на Google Lens</string>
   <!-- Lens image search button content description -->
@@ -4715,16 +4702,22 @@
   <string name="search_settings_google_lens_description">Изпраща изображения и снимки до Google за визуално търсене.</string>
   <!-- Caption shown under the Google Lens toggle clarifying when the feature is available -->
   <string name="preferences_google_lens_availability_caption">Достъпен само когато Google е включен по-горе и е вашата активна търсачка, докато сърфирате.</string>
-  <!-- Title for the Google Lens AI feature toggle -->
-  <string name="ai_controls_google_lens_title">Google Обектив</string>
-  <!-- Description for the Google Lens AI feature toggle -->
-  <string name="ai_controls_google_lens_description">Изпраща изображения и снимки до Google за визуално търсене.</string>
   <!-- Content description for the Google Lens half of the camera mode toggle -->
   <string name="lens_camera_mode_lens">Google Обектив</string>
   <!-- Content description for the QR scanner half of the camera mode toggle -->
   <string name="lens_camera_mode_qr">Скенер за QR код</string>
   <!-- Toast shown when the user picks an image from the gallery in QR mode but no QR code is found in it -->
   <string name="lens_camera_qr_no_code_found">Не е намерен QR код в изображението</string>
+  <!-- Title of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
+  <string name="lens_opt_out_title">Намерете го с Google Обектив</string>
+  <!-- Description of the bottom sheet shown the first time the user opens the Google Lens camera screen -->
+  <string name="lens_opt_out_description">Изберете изображение или използвайте камерата си, за да получите резултати с Google Обектив.</string>
+  <!-- Text of the link in the first-run Google Lens bottom sheet that opens the Search settings page -->
+  <string name="lens_opt_out_settings_link">Настройки на Google Обектив</string>
+  <!-- Button in the first-run Google Lens bottom sheet that dismisses it and starts the camera -->
+  <string name="lens_opt_out_try_it_now_button">Опитайте сега</string>
+  <!-- Button in the first-run Google Lens bottom sheet that leaves Google Lens without using it -->
+  <string name="lens_opt_out_not_now_button">Не сега</string>
   <!--
     Firefox Labs
 
@@ -4765,4 +4758,20 @@
   <string name="firefox_labs_feature_conflict">Тази функция не е налична за изпробване.</string>
   <!-- Text displayed on the Firefox Labs screen when there are no Labs experimental features present. -->
   <string name="firefox_labs_no_labs_available_description">В момента няма експериментални функции</string>
+  <!-- Title of the Firefox Labs Sandboxing experiment. -->
+  <string name="firefox_labs_website_isolation_title" tools:ignore="UnusedResources">Изолация на уеб сайтове</string>
+  <!-- Description of the Firefox Labs Sandboxing experiment. -->
+  <string name="firefox_labs_website_isolation_description" tools:ignore="UnusedResources">Допълнителна бариера между уебсайтовете, която помага за защитата на данните в различните раздели. Може да повлияе на производителността, стабилността, съвместимостта на уебсайта и начина на запазване на историята на разглеждане.</string>
+  <!--
+    PDF viewer toolbar and buttons
+
+    Content description for accessibility (used by screen readers): Description for the button that triggers the start of a signature workflow on the PDF displayed on the screen.
+  -->
+  <string name="pdf_tools_sign_content_description">Подписване на PDF</string>
+  <!-- Content description for accessibility (used by screen readers): Description of the button that downloads the PDF displayed on the screen to the user's device. -->
+  <string name="pdf_tools_download_content_description">Изтегляне на PDF</string>
+  <!-- Content description for accessibility (used by screen readers): Description for the button that opens the printing dialogue window for the PDF displayed on the screen. -->
+  <string name="pdf_tools_print_content_description">Отпечатване на PDF</string>
+  <!-- Content description for accessibility (used by screen readers): Description for the button that opens the sharing options for the PDF being displayed on the screen. -->
+  <string name="pdf_tools_share_content_description">Споделяне на PDF</string>
 </resources>

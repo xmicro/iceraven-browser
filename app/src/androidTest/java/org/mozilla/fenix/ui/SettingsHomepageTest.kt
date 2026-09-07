@@ -6,6 +6,7 @@ package org.mozilla.fenix.ui
 
 import org.junit.Rule
 import org.junit.Test
+import org.mozilla.fenix.R
 import org.mozilla.fenix.customannotations.Converted
 import org.mozilla.fenix.customannotations.SmokeTest
 import org.mozilla.fenix.helpers.AppAndSystemHelper.openAppFromExternalLink
@@ -14,6 +15,7 @@ import org.mozilla.fenix.helpers.HomeActivityIntentTestRule
 import org.mozilla.fenix.helpers.RetryTestRule
 import org.mozilla.fenix.helpers.RetryableComposeTestRule
 import org.mozilla.fenix.helpers.TestAssetHelper.getGenericAsset
+import org.mozilla.fenix.helpers.TestHelper.exitMenu
 import org.mozilla.fenix.helpers.TestHelper.mDevice
 import org.mozilla.fenix.helpers.TestHelper.restartApp
 import org.mozilla.fenix.helpers.perf.DetectMemoryLeaksRule
@@ -115,7 +117,7 @@ class SettingsHomepageTest {
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/1564999
     @Converted(
-        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.SettingsHomepageTest#verifyJumpBackInSectionTest"],
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.SettingsHomepageTest#jumpBackInOptionTest"],
         bug = 2042363,
         since = "2026-05",
     )
@@ -166,6 +168,11 @@ class SettingsHomepageTest {
     }
 
     // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/1569831
+    @Converted(
+        replacedBy = ["org.mozilla.fenix.ui.efficiency.tests.SettingsHomepageTest#verifyOpeningScreenOptionsTest"],
+        bug = 2058818,
+        since = "2026-07",
+    )
     @SmokeTest
     @Test
     fun verifyOpeningScreenOptionsTest() {
@@ -228,6 +235,71 @@ class SettingsHomepageTest {
 
         browserScreen(composeTestRule) {
             verifyPageContent(genericPage.content)
+        }
+    }
+
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/1676355
+    @Test
+    fun verifyTheWallpapersMenuUI() {
+        homeScreen(retryableComposeTestRule.current) {
+        }.openThreeDotMenu {
+        }.clickSettingsButton {
+        }.openHomepageSubMenu {
+        }.clickWallpapersMenuOption {
+            verifyTheWallpapersSettingsPageHeader()
+            verifyClassicFirefoxSection(retryableComposeTestRule.current)
+            verifyEdgeToEdgeWallpaperIsDisplayed(retryableComposeTestRule.current)
+            verifyDefaultWallpaperIsDisplayed(retryableComposeTestRule.current)
+        }
+    }
+
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/1676359
+    @Test
+    fun verifyWallpaperChangeFunctionalityTest() {
+        homeScreen(retryableComposeTestRule.current) {
+        }.openThreeDotMenu {
+        }.clickSettingsButton {
+        }.openHomepageSubMenu {
+        }.clickWallpapersMenuOption {
+            verifyEdgeToEdgeWallpaperIsSelected(retryableComposeTestRule.current)
+            verifyDefaultWallpaperIsNotSelected(retryableComposeTestRule.current)
+            clickTheDefaultWallpaper(retryableComposeTestRule.current)
+            verifyDefaultWallpaperIsSelected(retryableComposeTestRule.current)
+            verifyEdgeToEdgeWallpaperIsNotSelected(retryableComposeTestRule.current)
+        }.goBack {
+        }.goBack(retryableComposeTestRule.current) {
+            exitMenu()
+            verifyDefaultWallpaperApplied(retryableComposeTestRule.current)
+        }
+    }
+
+    // TestRail link: https://mozilla.testrail.io/index.php?/cases/view/3375726
+    @Test
+    fun verifyEdgeToEdgeWallpaperBackgroundAdaptation() {
+        homeScreen(retryableComposeTestRule.current) {
+        }.openThreeDotMenu {
+        }.clickSettingsButton {
+        }.openHomepageSubMenu {
+        }.clickWallpapersMenuOption {
+            verifyEdgeToEdgeWallpaperIsSelected(retryableComposeTestRule.current)
+        }.goBack {
+        }.goBack(retryableComposeTestRule.current) {
+            exitMenu()
+            verifyWindowBackgroundDrawable(retryableComposeTestRule.current, R.drawable.home_background_gradient)
+        }
+
+        homeScreen(retryableComposeTestRule.current) {
+        }.openThreeDotMenu {
+        }.clickSettingsButton {
+        }.openCustomizeSubMenu {
+            selectDarkMode()
+        }.goBack {
+        }.goBack(retryableComposeTestRule.current) {
+            verifyWindowBackgroundDrawable(retryableComposeTestRule.current, R.drawable.home_background_gradient)
+        }.togglePrivateBrowsingMode()
+
+        homeScreen(retryableComposeTestRule.current) {
+            verifyPrivateModeBackgroundApplied(retryableComposeTestRule.current)
         }
     }
 }

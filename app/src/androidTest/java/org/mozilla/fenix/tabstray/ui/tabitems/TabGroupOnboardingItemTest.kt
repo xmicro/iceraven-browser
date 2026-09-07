@@ -172,10 +172,12 @@ class TabGroupOnboardingItemTest {
                         onTabClose = {},
                         onItemClick = {},
                         onItemLongClick = {},
-                        onDeleteTabGroupClick = {},
                         onEditTabGroupClick = {},
                         onCloseTabGroupClick = {},
+                        onShareTabGroupClick = {},
+                        onDeleteTabGroupClick = {},
                         onTabGroupOnboardingDismiss = {},
+                        liveReorderEnabled = false,
                     )
                 }
             }

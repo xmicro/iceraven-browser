@@ -82,7 +82,6 @@ import mozilla.components.ui.icons.R as iconsR
  * @param isBookmarked Whether or not the current tab is bookmarked.
  * @param isDesktopMode Whether or not the desktop mode is enabled.
  * @param isPdf Whether or not the current tab is a PDF.
- * @param isPrivate Whether or not the current browsing mode is private
  * @param isReaderViewActive Whether or not Reader View is active or not.
  * @param isExtensionsProcessDisabled Whether or not the extensions process is disabled due to extension errors.
  * @param isMoreMenuHighlighted Whether or not the more menu icon is highlighted.
@@ -99,7 +98,7 @@ import mozilla.components.ui.icons.R as iconsR
  * @param onCustomizeReaderViewMenuClick Invoked when the user clicks on the Customize Reader View button.
  * @param onMozillaAccountButtonClick Invoked when the user clicks on Mozilla account button.
  * @param onSettingsButtonClick Invoked when the user clicks on the settings button.
- * @param onWallpaperButtonClick Invoked when the user clicks on the change wallpaper button.
+ * @param onCustomizeHomepageButtonClick Invoked when the user clicks on the customize homepage button.
  * @param onBookmarkPageMenuClick Invoked when the user clicks on the bookmark page menu item.
  * @param onEditBookmarkButtonClick Invoked when the user clicks on the edit bookmark button.
  * @param onSwitchToDesktopSiteMenuClick Invoked when the user clicks on the switch to desktop site
@@ -139,7 +138,6 @@ fun MainMenu(
     isBookmarked: Boolean,
     isDesktopMode: Boolean,
     isPdf: Boolean,
-    isPrivate: Boolean,
     isReaderViewActive: Boolean,
     isExtensionsProcessDisabled: Boolean,
     isMoreMenuHighlighted: Boolean,
@@ -156,7 +154,7 @@ fun MainMenu(
     onCustomizeReaderViewMenuClick: () -> Unit,
     onMozillaAccountButtonClick: () -> Unit,
     onSettingsButtonClick: () -> Unit,
-    onWallpaperButtonClick: () -> Unit,
+    onCustomizeHomepageButtonClick: () -> Unit,
     onBookmarkPageMenuClick: () -> Unit,
     onEditBookmarkButtonClick: () -> Unit,
     onSwitchToDesktopSiteMenuClick: () -> Unit,
@@ -277,7 +275,6 @@ fun MainMenu(
             MenuGroup {
                 ExtensionsMenuItem(
                     inCustomTab = false,
-                    isPrivate = isPrivate,
                     isExtensionsProcessDisabled = isExtensionsProcessDisabled,
                     isExtensionsExpanded = isExtensionsExpanded,
                     isAllWebExtensionsDisabled = isAllWebExtensionsDisabled,
@@ -294,7 +291,6 @@ fun MainMenu(
                 isBookmarked = isBookmarked,
                 isDesktopMode = isDesktopMode,
                 isPdf = isPdf,
-                isPrivate = isPrivate,
                 isExtensionsProcessDisabled = isExtensionsProcessDisabled,
                 isExtensionsExpanded = isExtensionsExpanded,
                 isMoreMenuHighlighted = isMoreMenuHighlighted,
@@ -325,15 +321,14 @@ fun MainMenu(
             MozillaAccountMenuItem(
                 account = account,
                 accountState = accountState,
-                isPrivate = isPrivate,
                 onClick = onMozillaAccountButtonClick,
             )
 
             if (accessPoint == MenuAccessPoint.Home) {
                 MenuItem(
-                    label = stringResource(id = R.string.browser_menu_change_wallpaper),
-                    beforeIconPainter = painterResource(id = iconsR.drawable.mozac_ic_wallpaper_24),
-                    onClick = onWallpaperButtonClick,
+                    label = stringResource(id = R.string.browser_menu_customize_homepage),
+                    beforeIconPainter = painterResource(id = iconsR.drawable.mozac_ic_home_24),
+                    onClick = onCustomizeHomepageButtonClick,
                 )
             }
 
@@ -375,7 +370,6 @@ private fun ToolsAndActionsMenuGroup(
     isBookmarked: Boolean,
     isDesktopMode: Boolean,
     isPdf: Boolean,
-    isPrivate: Boolean,
     isExtensionsProcessDisabled: Boolean,
     isExtensionsExpanded: Boolean,
     isMoreMenuHighlighted: Boolean,
@@ -452,7 +446,6 @@ private fun ToolsAndActionsMenuGroup(
 
         ExtensionsMenuItem(
             inCustomTab = false,
-            isPrivate = isPrivate,
             isExtensionsProcessDisabled = isExtensionsProcessDisabled,
             isExtensionsExpanded = isExtensionsExpanded,
             isAllWebExtensionsDisabled = isAllWebExtensionsDisabled,
@@ -501,7 +494,7 @@ private fun MoreMenuButtonGroup(
             Icon(
                 painter = painterResource(id = iconsR.drawable.mozac_ic_chevron_down_20),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.semantics {
                     testTagsAsResourceId = true
                     testTag = MORE_OPTION_CHEVRON
@@ -740,7 +733,6 @@ private fun MenuDialogPreview(
                 accessPoint = MenuAccessPoint.Browser,
                 account = null,
                 accountState = AuthenticationProblem,
-                isPrivate = false,
                 showQuitMenu = true,
                 isBottomToolbar = false,
                 isExpandedToolbarEnabled = false,
@@ -767,7 +759,7 @@ private fun MenuDialogPreview(
                 onCustomizeReaderViewMenuClick = {},
                 onMozillaAccountButtonClick = {},
                 onSettingsButtonClick = {},
-                onWallpaperButtonClick = {},
+                onCustomizeHomepageButtonClick = {},
                 onBookmarkPageMenuClick = {},
                 onEditBookmarkButtonClick = {},
                 onSwitchToDesktopSiteMenuClick = {},
@@ -809,7 +801,6 @@ private fun MenuDialogPrivatePreview(
                 accessPoint = MenuAccessPoint.Home,
                 account = null,
                 accountState = AuthenticationProblem,
-                isPrivate = false,
                 showQuitMenu = true,
                 isBottomToolbar = true,
                 isExpandedToolbarEnabled = false,
@@ -834,7 +825,7 @@ private fun MenuDialogPrivatePreview(
                 onCustomizeReaderViewMenuClick = {},
                 onMozillaAccountButtonClick = {},
                 onSettingsButtonClick = {},
-                onWallpaperButtonClick = {},
+                onCustomizeHomepageButtonClick = {},
                 onBookmarkPageMenuClick = {},
                 onEditBookmarkButtonClick = {},
                 onSwitchToDesktopSiteMenuClick = {},
