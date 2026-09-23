@@ -1,18 +1,18 @@
 diff --git a/components/browser/session-storage/src/main/java/mozilla/components/browser/session/storage/AutoSave.kt b/components/browser/session-storage/src/main/java/mozilla/components/browser/session/storage/AutoSave.kt
-index 4bf52338..27a1a028 100644
+index 15115fc..36af350 100644
 --- a/components/browser/session-storage/src/main/java/mozilla/components/browser/session/storage/AutoSave.kt
 +++ b/components/browser/session-storage/src/main/java/mozilla/components/browser/session/storage/AutoSave.kt
-@@ -11,7 +11,9 @@ import androidx.lifecycle.Lifecycle
- import androidx.lifecycle.LifecycleObserver
- import androidx.lifecycle.LifecycleOwner
- import androidx.lifecycle.ProcessLifecycleOwner
+@@ -15,7 +15,9 @@ import java.util.concurrent.Executors
+ import java.util.concurrent.ScheduledExecutorService
+ import java.util.concurrent.ScheduledFuture
+ import java.util.concurrent.TimeUnit
 +import kotlinx.coroutines.CompletableDeferred
  import kotlinx.coroutines.CoroutineScope
 +import kotlinx.coroutines.CoroutineStart
  import kotlinx.coroutines.DelicateCoroutinesApi
  import kotlinx.coroutines.Dispatchers
  import kotlinx.coroutines.GlobalScope
-@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
+@@ -25,6 +27,7 @@ import kotlinx.coroutines.flow.Flow
  import kotlinx.coroutines.flow.distinctUntilChanged
  import kotlinx.coroutines.flow.map
  import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ index 4bf52338..27a1a028 100644
  import mozilla.components.browser.state.selector.normalTabs
  import mozilla.components.browser.state.selector.selectedTab
  import mozilla.components.browser.state.state.BrowserState
-@@ -52,6 +55,8 @@ class AutoSave(
+@@ -51,6 +54,8 @@ class AutoSave(
      internal val logger = Logger("SessionStorage/AutoSave")
      internal var saveJob: Job? = null
      private var lastSaveTimestamp: Long = now()
@@ -29,7 +29,7 @@ index 4bf52338..27a1a028 100644
  
      /**
       * Saves the state periodically when the app is in the foreground.
-@@ -104,8 +109,8 @@ class AutoSave(
+@@ -94,8 +99,8 @@ class AutoSave(
      /**
       * Triggers saving the current state to disk.
       *
@@ -40,7 +40,7 @@ index 4bf52338..27a1a028 100644
       *
       * @param delaySave Whether to delay the save job to obey the interval passed to [SessionStorage.autoSave].
       */
-@@ -114,7 +119,10 @@ class AutoSave(
+@@ -104,7 +109,10 @@ class AutoSave(
          val currentJob = saveJob
  
          if (currentJob != null && currentJob.isActive) {
@@ -52,7 +52,7 @@ index 4bf52338..27a1a028 100644
              return currentJob
          }
  
-@@ -122,26 +130,55 @@ class AutoSave(
+@@ -112,27 +120,55 @@ class AutoSave(
          val delayMs = lastSaveTimestamp + minimumIntervalMs - now
          lastSaveTimestamp = now
  
@@ -61,66 +61,69 @@ index 4bf52338..27a1a028 100644
 +
          @OptIn(DelicateCoroutinesApi::class)
 -        GlobalScope.launch(Dispatchers.IO) {
+-                if (delaySave && delayMs > 0) {
+-                    logger.debug("Delaying save (${delayMs}ms)")
+-                    delay(delayMs)
+-                }
 +        val job = GlobalScope.launch(Dispatchers.IO, start = CoroutineStart.LAZY) {
-             if (delaySave && delayMs > 0) {
-                 logger.debug("Delaying save (${delayMs}ms)")
--                delay(delayMs)
++            if (delaySave && delayMs > 0) {
++                logger.debug("Delaying save (${delayMs}ms)")
 +                withTimeoutOrNull(delayMs) { urgentSignal.await() }
-             }
++            }
  
--            val start = now()
 +            var failedAttempts = 0
 +            while (true) {
-+                val start = now()
+                 val start = now()
 +                val saved = try {
 +                    sessionStorage.save(store.state)
 +                } catch (e: Exception) {
 +                    logger.error("Failed to save browser state", e)
 +                    false
 +                }
-+
+ 
+-                try {
+-                    val state = store.state
+-                    sessionStorage.save(state)
+-                } finally {
+-                    val took = now() - start
+-                    logger.debug("Saved state to disk [${took}ms]")
 +                if (saved) {
 +                    failedAttempts = 0
 +                    logger.debug("Saved state to disk [${now() - start}ms]")
 +                } else {
 +                    failedAttempts++
 +                    logger.error("Browser state was not saved; the previous session snapshot is still in use")
-+                }
- 
--            try {
--                val state = store.state
--                sessionStorage.save(state)
--            } finally {
--                val took = now() - start
--                logger.debug("Saved state to disk [${took}ms]")
-+                val (repeatSave, delayRetry) = synchronized(this@AutoSave) {
+                 }
++
++                val retryAfterFailure = synchronized(this@AutoSave) {
 +                    when {
 +                        saveRequestedWhileBusy -> {
 +                            saveRequestedWhileBusy = false
-+                            true to false
++                            true
 +                        }
-+                        !saved && failedAttempts < MAX_SAVE_ATTEMPTS -> true to true
++                        !saved && failedAttempts < MAX_SAVE_ATTEMPTS -> true
 +                        else -> {
 +                            saveJob = null
 +                            urgentSaveSignal = null
-+                            false to false
++                            false
 +                        }
 +                    }
 +                }
-+                if (!repeatSave) break
-+                if (delayRetry) delay(RETRY_DELAY_MILLISECONDS)
++                if (!retryAfterFailure) break
++                if (!saved) delay(RETRY_DELAY_MILLISECONDS)
              }
--        }.also {
--            saveJob = it
--            return it
-         }
+-            .also {
+-                saveJob = it
+-                return it
+-            }
++        }
 +        saveJob = job
 +        job.start()
 +        return job
      }
  
-     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-@@ -150,6 +187,8 @@ class AutoSave(
+     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE) internal fun now() = SystemClock.elapsedRealtime()
+@@ -140,6 +176,8 @@ class AutoSave(
      companion object {
          // Minimum interval between saving states.
          const val DEFAULT_INTERVAL_MILLISECONDS = 2000L
@@ -129,46 +132,44 @@ index 4bf52338..27a1a028 100644
      }
  }
  
-@@ -208,7 +247,7 @@ private class StateMonitoring(
+@@ -191,7 +229,7 @@ private class StateMonitoring(private val autoSave: AutoSave) {
              .map { state ->
                  Observation(
                      selectedTabId = state.selectedTabId,
 -                    tabs = state.normalTabs.size,
 +                    tabIds = state.normalTabs.map { it.id },
                      loading = state.selectedTab?.content?.loading,
-                     tabPartitions = state.tabPartitions,
                  )
-@@ -228,8 +267,8 @@ private class StateMonitoring(
-         val triggerSave = if (lastObservation!!.selectedTabId != observation.selectedTabId) {
-             autoSave.logger.info("Save: New tab selected")
-             true
--        } else if (lastObservation!!.tabs != observation.tabs) {
--            autoSave.logger.info("Save: Number of tabs changed")
-+        } else if (lastObservation!!.tabIds != observation.tabIds) {
-+            autoSave.logger.info("Save: Tabs changed")
-             true
-         } else if (lastObservation!!.loading != observation.loading && observation.loading == false) {
-             autoSave.logger.info("Save: Load finished")
-@@ -250,7 +289,7 @@ private class StateMonitoring(
+             }
+@@ -211,8 +249,8 @@ private class StateMonitoring(private val autoSave: AutoSave) {
+             if (lastObservation!!.selectedTabId != observation.selectedTabId) {
+                 autoSave.logger.info("Save: New tab selected")
+                 true
+-            } else if (lastObservation!!.tabs != observation.tabs) {
+-                autoSave.logger.info("Save: Number of tabs changed")
++            } else if (lastObservation!!.tabIds != observation.tabIds) {
++                autoSave.logger.info("Save: Tabs changed")
+                 true
+             } else if (lastObservation!!.loading != observation.loading && observation.loading == false) {
+                 autoSave.logger.info("Save: Load finished")
+@@ -230,7 +268,7 @@ private class StateMonitoring(private val autoSave: AutoSave) {
  
      private data class Observation(
          val selectedTabId: String?,
 -        val tabs: Int,
 +        val tabIds: List<String>,
          val loading: Boolean?,
-         val tabPartitions: Map<String, TabPartition>,
      )
+ }
 diff --git a/components/browser/session-storage/src/main/java/mozilla/components/browser/session/storage/SessionStorage.kt b/components/browser/session-storage/src/main/java/mozilla/components/browser/session/storage/SessionStorage.kt
-index 2b588f3a..573778b6 100644
+index d343e0e..c6680dc 100644
 --- a/components/browser/session-storage/src/main/java/mozilla/components/browser/session/storage/SessionStorage.kt
 +++ b/components/browser/session-storage/src/main/java/mozilla/components/browser/session/storage/SessionStorage.kt
-@@ -65,12 +65,12 @@ class SessionStorage(
-     @VisibleForTesting
-     internal fun isUriReadable(uri: Uri): Boolean = uri.isReadable(context.contentResolver)
+@@ -62,18 +62,19 @@ class SessionStorage(
  
--    /**
--     * Clears the state saved on disk.
--     */
+     @VisibleForTesting internal fun isUriReadable(uri: Uri): Boolean = uri.isReadable(context.contentResolver)
+ 
+-    /** Clears the state saved on disk. */
 +    /** Clears the state saved on disk. Returns false if the old snapshot remains. */
      @WorkerThread
 -    fun clear() {
@@ -179,8 +180,7 @@ index 2b588f3a..573778b6 100644
 +        }
      }
  
-     /**
-@@ -79,8 +79,7 @@ class SessionStorage(
+     /** Saves the given state to disk. */
      @WorkerThread
      override fun save(state: BrowserState): Boolean {
          if (state.normalTabs.isEmpty()) {
@@ -190,7 +190,7 @@ index 2b588f3a..573778b6 100644
          }
  
          // "about:crashparent" is meant for testing purposes only.  If saved/restored then it will
-@@ -100,7 +99,11 @@ class SessionStorage(
+@@ -94,7 +95,11 @@ class SessionStorage(
          return synchronized(sessionFileLock) {
              try {
                  val file = getFileForEngine(context, engine)
@@ -203,14 +203,13 @@ index 2b588f3a..573778b6 100644
              } catch (e: OutOfMemoryError) {
                  crashReporting?.submitCaughtException(e)
                  logger.error("Failed to save state to disk due to OutOfMemoryError", e)
-@@ -122,10 +125,11 @@ class SessionStorage(
+@@ -114,9 +119,11 @@ class SessionStorage(
      }
  }
  
 -private fun removeSnapshotFromDisk(context: Context, engine: Engine) {
 -    synchronized(sessionFileLock) {
--        getFileForEngine(context, engine)
--            .delete()
+-        getFileForEngine(context, engine).delete()
 +private fun removeSnapshotFromDisk(context: Context, engine: Engine): Boolean {
 +    return synchronized(sessionFileLock) {
 +        val file = getFileForEngine(context, engine)
@@ -220,11 +219,17 @@ index 2b588f3a..573778b6 100644
  }
  
 diff --git a/components/browser/session-storage/src/test/java/mozilla/components/browser/session/storage/AutoSaveTest.kt b/components/browser/session-storage/src/test/java/mozilla/components/browser/session/storage/AutoSaveTest.kt
-index 8f0f13d8..9b18be60 100644
+index 69c1148..463419f 100644
 --- a/components/browser/session-storage/src/test/java/mozilla/components/browser/session/storage/AutoSaveTest.kt
 +++ b/components/browser/session-storage/src/test/java/mozilla/components/browser/session/storage/AutoSaveTest.kt
-@@ -10,6 +10,8 @@ import androidx.lifecycle.LifecycleRegistry
+@@ -8,11 +8,14 @@ import androidx.lifecycle.Lifecycle
+ import androidx.lifecycle.LifecycleOwner
+ import androidx.lifecycle.LifecycleRegistry
  import androidx.test.ext.junit.runners.AndroidJUnit4
++import java.util.concurrent.CountDownLatch
+ import java.util.concurrent.ScheduledExecutorService
+ import java.util.concurrent.ScheduledFuture
+ import java.util.concurrent.TimeUnit
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Job
 +import kotlinx.coroutines.runBlocking
@@ -232,7 +237,7 @@ index 8f0f13d8..9b18be60 100644
  import kotlinx.coroutines.test.StandardTestDispatcher
  import kotlinx.coroutines.test.runTest
  import mozilla.components.browser.state.action.ContentAction
-@@ -28,14 +30,18 @@ import mozilla.components.support.test.robolectric.testContext
+@@ -28,11 +31,14 @@ import mozilla.components.support.test.robolectric.testContext
  import org.junit.Assert.assertNotSame
  import org.junit.Assert.assertNull
  import org.junit.Assert.assertSame
@@ -247,11 +252,7 @@ index 8f0f13d8..9b18be60 100644
  import org.mockito.Mockito.verify
  import org.mockito.Mockito.verifyNoMoreInteractions
  import org.mockito.Mockito.`when`
-+import java.util.concurrent.CountDownLatch
- import java.util.concurrent.ScheduledExecutorService
- import java.util.concurrent.ScheduledFuture
- import java.util.concurrent.TimeUnit
-@@ -46,6 +52,10 @@ class AutoSaveTest {
+@@ -43,6 +49,10 @@ class AutoSaveTest {
      private val testDispatcher = StandardTestDispatcher()
      private val scope = CoroutineScope(testDispatcher)
  
@@ -262,7 +263,7 @@ index 8f0f13d8..9b18be60 100644
      @Test
      fun `AutoSave - when going to background`() {
          runTest(testDispatcher) {
-@@ -54,7 +64,7 @@ class AutoSaveTest {
+@@ -51,7 +61,7 @@ class AutoSaveTest {
              val owner = mock(LifecycleOwner::class.java)
              val lifecycle = LifecycleRegistry(owner)
  
@@ -271,88 +272,61 @@ index 8f0f13d8..9b18be60 100644
  
              val state = BrowserState()
              val store = BrowserStore(state)
-@@ -87,7 +97,7 @@ class AutoSaveTest {
+@@ -86,7 +96,7 @@ class AutoSaveTest {
              val state = BrowserState()
              val store = BrowserStore(state)
  
 -            val sessionStorage: SessionStorage = mock()
 +            val sessionStorage = successfulStorage()
  
-             val autoSave = AutoSave(
-                 store = store,
-@@ -117,7 +127,7 @@ class AutoSaveTest {
+             val autoSave =
+                 AutoSave(
+@@ -114,7 +124,7 @@ class AutoSaveTest {
      @Test
      fun `AutoSave - when tab gets removed`() {
          runTest(testDispatcher) {
 -            val sessionStorage: SessionStorage = mock()
 +            val sessionStorage = successfulStorage()
  
-             val store = BrowserStore(
-                 BrowserState(
-@@ -163,7 +173,7 @@ class AutoSaveTest {
-                 ),
-             )
+             val store =
+                 BrowserStore(
+@@ -166,7 +176,7 @@ class AutoSaveTest {
+                     )
+                 )
  
 -            val sessionStorage: SessionStorage = mock()
 +            val sessionStorage = successfulStorage()
  
-             val autoSave = AutoSave(
-                 store = store,
-@@ -196,7 +206,7 @@ class AutoSaveTest {
-                 ),
-             )
+             val autoSave =
+                 AutoSave(
+@@ -202,7 +212,7 @@ class AutoSaveTest {
+                     )
+                 )
  
 -            val sessionStorage: SessionStorage = mock()
 +            val sessionStorage = successfulStorage()
  
-             val autoSave = AutoSave(
-                 store = store,
-@@ -231,7 +241,7 @@ class AutoSaveTest {
-                 ),
-             )
+             val autoSave =
+                 AutoSave(
+@@ -241,7 +251,7 @@ class AutoSaveTest {
+                     )
+                 )
  
 -            val sessionStorage: SessionStorage = mock()
 +            val sessionStorage = successfulStorage()
  
-             val autoSave = AutoSave(
-                 store = store,
-@@ -257,7 +267,7 @@ class AutoSaveTest {
+             val autoSave =
+                 AutoSave(
+@@ -269,7 +279,7 @@ class AutoSaveTest {
      @Test
      fun `AutoSave - when tab loading state changes`() {
          runTest(testDispatcher) {
 -            val sessionStorage: SessionStorage = mock()
 +            val sessionStorage = successfulStorage()
  
-             val store = BrowserStore(
-                 BrowserState(
-@@ -307,7 +317,7 @@ class AutoSaveTest {
-             val state = BrowserState()
-             val store = BrowserStore(state)
- 
--            val sessionStorage: SessionStorage = mock()
-+            val sessionStorage = successfulStorage()
- 
-             val autoSave = AutoSave(
-                 store = store,
-@@ -348,7 +358,7 @@ class AutoSaveTest {
-             )
-             val store = BrowserStore(state)
- 
--            val sessionStorage: SessionStorage = mock()
-+            val sessionStorage = successfulStorage()
- 
-             val autoSave = AutoSave(
-                 store = store,
-@@ -392,7 +402,7 @@ class AutoSaveTest {
-             )
-             val store = BrowserStore(state)
- 
--            val sessionStorage: SessionStorage = mock()
-+            val sessionStorage = successfulStorage()
- 
-             val autoSave = AutoSave(
-                 store = store,
-@@ -467,7 +477,7 @@ class AutoSaveTest {
+             val store =
+                 BrowserStore(
+@@ -361,7 +371,7 @@ class AutoSaveTest {
  
      @Test
      fun `AutoSave - No new job triggered while save in flight`() {
@@ -361,7 +335,7 @@ index 8f0f13d8..9b18be60 100644
  
          val state = BrowserState()
          val store = BrowserStore(state)
-@@ -479,14 +489,15 @@ class AutoSaveTest {
+@@ -374,14 +384,15 @@ class AutoSaveTest {
  
          val runningJob: Job = mock()
          doReturn(true).`when`(runningJob).isActive
@@ -379,7 +353,7 @@ index 8f0f13d8..9b18be60 100644
  
          val state = BrowserState()
          val store = BrowserStore(state)
-@@ -498,8 +509,61 @@ class AutoSaveTest {
+@@ -394,8 +405,61 @@ class AutoSaveTest {
  
          val completed: Job = mock()
          doReturn(false).`when`(completed).isActive
@@ -442,10 +416,10 @@ index 8f0f13d8..9b18be60 100644
 +    }
  }
 diff --git a/components/browser/session-storage/src/test/java/mozilla/components/browser/session/storage/SessionStorageTest.kt b/components/browser/session-storage/src/test/java/mozilla/components/browser/session/storage/SessionStorageTest.kt
-index 054b0a03..a44f5f43 100644
+index a9360f6..fb5fe21 100644
 --- a/components/browser/session-storage/src/test/java/mozilla/components/browser/session/storage/SessionStorageTest.kt
 +++ b/components/browser/session-storage/src/test/java/mozilla/components/browser/session/storage/SessionStorageTest.kt
-@@ -168,7 +168,7 @@ class SessionStorageTest {
+@@ -164,7 +164,7 @@ class SessionStorageTest {
          val engine = FakeEngine()
  
          val storage = spy(SessionStorage(testContext, engine))
@@ -454,7 +428,7 @@ index 054b0a03..a44f5f43 100644
  
          verify(storage).clear()
  
-@@ -193,7 +193,7 @@ class SessionStorageTest {
+@@ -190,7 +190,7 @@ class SessionStorageTest {
          val persisted = storage.save(state)
          assertTrue(persisted)
  
