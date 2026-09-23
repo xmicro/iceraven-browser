@@ -39,9 +39,7 @@ class AdjustMetricsService(private val application: Application) : MetricsServic
         const val CONVERSION_EVENT_9 = 9
         const val CONVERSION_EVENT_10 = 10
 
-        /**
-         * Records a glean event matching the Adjust conversion event, and sends the Adjust attribution ping.
-         */
+        /** Records a glean event matching the Adjust conversion event, and sends the Adjust attribution ping. */
         @VisibleForTesting
         internal fun sendGleanEventAndPing(
             event: Event,
@@ -50,9 +48,7 @@ class AdjustMetricsService(private val application: Application) : MetricsServic
             /* noop */
         }
 
-        /**
-         * Sets third party sharing settings based on distribution and attribution.
-         */
+        /** Sets third party sharing settings based on distribution and attribution. */
         @Suppress("LongParameterList")
         @VisibleForTesting
         internal fun applyThirdPartySharingSettings(
@@ -71,8 +67,10 @@ class AdjustMetricsService(private val application: Application) : MetricsServic
 
         @VisibleForTesting
         internal fun alreadyKnown(settings: Settings): Boolean {
-            return settings.adjustCampaignId.isNotEmpty() || settings.adjustNetwork.isNotEmpty() ||
-                settings.adjustCreative.isNotEmpty() || settings.adjustAdGroup.isNotEmpty()
+            return settings.adjustCampaignId.isNotEmpty() ||
+                settings.adjustNetwork.isNotEmpty() ||
+                settings.adjustCreative.isNotEmpty() ||
+                settings.adjustAdGroup.isNotEmpty()
         }
 
         private fun triggerPing() {
