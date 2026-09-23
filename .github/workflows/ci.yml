@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - iceraven
+      - session-fix
 
 jobs:
   release-automation:
